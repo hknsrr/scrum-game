@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #6d6d6d;
+    padding: 20px;
+}
+
+input {
+    margin-bottom: 10px;
+    background-color: #bdbdbd;
+}
+
+button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+
+#users li {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+#users li:last-child {
+    border-bottom: none;
+}
+
+.userCard {
+    border: 1px solid gray;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 100px;
+    backdrop-filter: sepia(1);
+    background: #d0d0d0;
+    margin: 5px;
+    padding: 5px;
+    width: 130px;
+}
+
+.userCard.voted {
+    border: 2px solid #007bff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+button:disabled,
+button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+    pointer-events: none;
+    opacity: 0.75;
+}
+
+
+
+
+/* ... (önceki stil tanımlamaları) */
+
+#userContainer {
+    width: 650px;
+    height: 300px;
+    position: relative;
+    margin: 5% auto;
+    /* border: 2px solid #ddd; */
+    border-radius: 50%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+/* #users .userCard {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 80px;
+} */
+
+/* ... */
+
+.d-none {
+    display: none;
+}
+
+.join-section {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.users {
+    display: flex;
+    flex-wrap: wrap;
+}

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Scrum Poker</title>
+    <link
+        rel="stylesheet"
+        href="index.css"
+    >
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket = io.connect('/');
+        let currentRoom;
+        let isMaster = false;
+
+
+        function joinRoom() {
+            let name = document.getElementById('username').value;
+            let room = document.getElementById('room').value;
+            isMaster = document.getElementById('isMaster').checked;
+
+            if (name && room) {
+                currentRoom = room;
+                socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster });
+
+                if (isMaster) {
+                    document.getElementById('revealBtn').style.display = 'block';
+                    document.getElementById('resetBtn').style.display = 'block'; // Yeniden Başlat butonunu göster
+                }
+
+                document.getElementById('joinSection').style.display = 'none';
+                document.getElementById('gameSection').classList.remove('d-none');
+            } else {
+                alert('ismini ve bağlanmak istediğin odayı gir.');
+            }
+        }
+
+        socket.on('updateUsers', function (users) {
+            let userList = '';
+            let userCount = Object.keys(users).length;
+
+            let width = 250;  // Container width
+            let height = 250; // Container height
+            let usersPerSide = Math.ceil(userCount / 4); // Approximately users per side
+
+            let spacingX = width / (usersPerSide + 1);
+            let spacingY = height / (usersPerSide + 1);
+
+            let count = 0;
+
+            Object.values(users).forEach((user) => {
+                let x, y;
+
+                // Top side
+                if (count < usersPerSide) {
+                    x = (count + 1) * spacingX;
+                    y = 0;
+                }
+                // Right side
+                else if (count < 2 * usersPerSide) {
+                    x = width;
+                    y = (count + 1 - usersPerSide) * spacingY;
+                }
+                // Bottom side
+                else if (count < 3 * usersPerSide) {
+                    x = (count + 1 - 2 * usersPerSide) * spacingX;
+                    y = height;
+                }
+                // Left side
+                else {
+                    x = 0;
+                    y = (count + 1 - 3 * usersPerSide) * spacingY;
+                }
+
+                x = (x / width) * 100; // Convert to percentage
+                y = (y / height) * 100; // Convert to percentage
+
+                userList += `
+            <div class="userCard" style="left: ${x}%; top: ${y}%">
+                <h3>${user.name}</h3>
+                <p>${user.vote !== null ? 'Voted' : 'Not voted'}</p>
+            </div>
+        `;
+
+                count++;
+            });
+
+            document.getElementById("users").innerHTML = userList;
+            document.getElementById("userCount").innerText = `Total Users: ${userCount}`;
+        });
+
+
+
+        socket.on('updateVotes', function (users) {
+            let userList = '';
+            for (let userId in users) {
+                userList += `
+            <div class="userCard ${users[userId].vote !== null ? 'voted' : ''}">
+                <h3>${users[userId].name}</h3>
+                <p>${users[userId].vote}</p>
+            </div>
+        `;
+            }
+            document.getElementById("users").innerHTML = userList;
+        });
+
+
+
+        socket.on('revealVotes', function (users) {
+            let userList = '';
+            for (let userId in users) {
+                userList += `
+            <div class="userCard">
+                <h3>${users[userId].name}</h3>
+                <p>${users[userId].vote || 'Not voted'}</p>
+            </div>
+        `;
+            }
+            document.getElementById("users").innerHTML = userList;
+        });
+
+        socket.on('allVoted', function () {
+            document.getElementById('revealBtn').removeAttribute('disabled');
+        });
+
+        socket.on('votesReset', function (users) {
+            let userList = '';
+            for (let userId in users) {
+                userList += `
+            <div class="userCard">
+                <h3>${users[userId].name}</h3>
+                <p>Not voted</p>
+            </div>
+        `;
+            }
+            document.getElementById("users").innerHTML = userList;
+            document.getElementById('revealBtn').setAttribute('disabled', true);
+        });
+
+        function sendVote(vote) {
+            socket.emit('vote', { vote: vote, room: currentRoom });
+        }
+
+        function showVotes() {
+            socket.emit('showVotes', currentRoom);
+            document.getElementById('resetBtn').removeAttribute('disabled'); // Butonu aktif hale getir
+        }
+
+        function resetVotes() {
+            document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
+            socket.emit('resetVotes', currentRoom);
+        }
+
+
+
+
+
+    </script>
+</head>
+
+<body>
+    <div
+    class="join-section"
+    id="joinSection"
+>
+    <div>
+
+        <label for="username">Name:</label>
+        <input
+            type="text"
+            id="username"
+            required
+        >
+    </div>
+    <div>
+
+        <label for="room">Room:</label>
+        <input
+            type="text"
+            id="room"
+            required
+        >
+    </div>
+
+    <div>
+
+        <label for="isMaster">Scrum Master:</label>
+        <input
+            type="checkbox"
+            id="isMaster"
+        >
+    </div>
+    <button onclick="joinRoom()">Join Room</button>
+</div>
+
+<div
+    id="userCount"
+    style="margin: 10px 0px;"
+>Total Users: 0</div>
+
+<div
+    id="gameSection"
+    class="game-section d-none"
+>
+
+
+    <button onclick="sendVote(0)">0</button>
+    <button onclick="sendVote(0.5)">1/2</button>
+    <button onclick="sendVote(1)">1</button>
+    <button onclick="sendVote(2)">2</button>
+    <button onclick="sendVote(3)">3</button>
+    <button onclick="sendVote(5)">5</button>
+    <button onclick="sendVote(8)">8</button>
+    <button onclick="sendVote(13)">13</button>
+    <button onclick="sendVote(20)">20</button>
+    <button onclick="sendVote(40)">40</button>
+    <button onclick="sendVote(100)">100</button>
+
+    <div id="userContainer">
+        <div class="users" id="users"></div>
+    </div>
+
+
+    <button
+        id="revealBtn"
+        onclick="showVotes()"
+        style="display: none;"
+        disabled
+    >Reveal Votes</button>
+
+    <button
+        id="resetBtn"
+        onclick="resetVotes()"
+        style="display: none;"
+        disabled
+    >Yeniden Başlat</button>
+
+</div>
+
+
+</body>
+
+</html>
