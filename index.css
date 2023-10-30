@@ -4,6 +4,22 @@ body {
     padding: 20px;
 }
 
+body::before {
+    position: fixed;
+    top: 40%;
+    left: 40%;
+    content: "ECM";
+    color: rgba(0, 0, 0, 0.1);
+    /* Bu değeri değiştirerek yazının solukluğunu ayarlayabilirsiniz. */
+    font-size: 7rem;
+    /* Font boyutunu değiştirmek isterseniz bu değeri ayarlayabilirsiniz. */
+}
+
+
+
+
+
+
 input {
     margin-bottom: 10px;
     background-color: #bdbdbd;
@@ -44,6 +60,7 @@ button:hover {
     margin: 5px;
     padding: 5px;
     width: 130px;
+    filter: drop-shadow(1px 1px 1px black);
 }
 
 .userCard.voted {
