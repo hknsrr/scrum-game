@@ -15,11 +15,6 @@ body::before {
     /* Font boyutunu değiştirmek isterseniz bu değeri ayarlayabilirsiniz. */
 }
 
-
-
-
-
-
 input {
     margin-bottom: 10px;
     background-color: #bdbdbd;
@@ -77,11 +72,6 @@ button[disabled] {
     opacity: 0.75;
 }
 
-
-
-
-/* ... (önceki stil tanımlamaları) */
-
 #userContainer {
     width: 650px;
     height: 300px;
@@ -93,14 +83,6 @@ button[disabled] {
     box-sizing: border-box;
     overflow: visible;
 }
-
-/* #users .userCard {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    width: 80px;
-} */
-
-/* ... */
 
 .d-none {
     display: none;

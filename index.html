@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta
@@ -88,7 +87,7 @@
         });
 
         socket.on('allVoted', function () {
-            document.getElementById('revealBtn').removeAttribute('disabled');
+            // document.getElementById('revealBtn').removeAttribute('disabled');
         });
 
         socket.on('votesReset', function (users) {
@@ -102,7 +101,7 @@
         `;
             }
             document.getElementById("users").innerHTML = userList;
-            document.getElementById('revealBtn').setAttribute('disabled', true);
+            // document.getElementById('revealBtn').setAttribute('disabled', true);
         });
 
         function sendVote(vote) {
@@ -118,11 +117,6 @@
             document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
             socket.emit('resetVotes', currentRoom);
         }
-
-
-
-
-
     </script>
 </head>
 
@@ -170,8 +164,6 @@
         id="gameSection"
         class="game-section d-none"
     >
-
-
         <button onclick="sendVote(0)">0</button>
         <button onclick="sendVote(0.5)">1/2</button>
         <button onclick="sendVote(1)">1</button>
@@ -191,13 +183,10 @@
                 id="users"
             ></div>
         </div>
-
-
         <button
             id="revealBtn"
             onclick="showVotes()"
             style="display: none;"
-            disabled
         >Reveal Votes</button>
 
         <button
@@ -209,7 +198,5 @@
 
     </div>
 
-
 </body>
-
 </html>
