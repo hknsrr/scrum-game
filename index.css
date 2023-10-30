@@ -98,3 +98,8 @@ button[disabled] {
     display: flex;
     flex-wrap: wrap;
 }
+
+.active {
+    background-color: #62da00;
+    padding: 15px;
+}

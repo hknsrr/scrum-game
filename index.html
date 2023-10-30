@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta
@@ -104,7 +105,15 @@
             // document.getElementById('revealBtn').setAttribute('disabled', true);
         });
 
-        function sendVote(vote) {
+        function sendVote(e, vote) {
+
+
+            let voteButtons = document.querySelectorAll('.game-section button');
+            voteButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
+            e.target.classList.add('active');
             socket.emit('vote', { vote: vote, room: currentRoom });
         }
 
@@ -164,18 +173,18 @@
         id="gameSection"
         class="game-section d-none"
     >
-        <button onclick="sendVote(0)">0</button>
-        <button onclick="sendVote(0.5)">1/2</button>
-        <button onclick="sendVote(1)">1</button>
-        <button onclick="sendVote(2)">2</button>
-        <button onclick="sendVote(3)">3</button>
-        <button onclick="sendVote(5)">5</button>
-        <button onclick="sendVote(8)">8</button>
-        <button onclick="sendVote(13)">13</button>
-        <button onclick="sendVote(20)">20</button>
-        <button onclick="sendVote(40)">40</button>
-        <button onclick="sendVote(100)">100</button>
-        <button onclick="sendVote('coffee ☕')">☕</button>
+        <button onclick="sendVote(event, 0)">0</button>
+        <button onclick="sendVote(event, 0.5)">1/2</button>
+        <button onclick="sendVote(event, 1)">1</button>
+        <button onclick="sendVote(event, 2)">2</button>
+        <button onclick="sendVote(event, 3)">3</button>
+        <button onclick="sendVote(event, 5)">5</button>
+        <button onclick="sendVote(event, 8)">8</button>
+        <button onclick="sendVote(event, 13)">13</button>
+        <button onclick="sendVote(event, 20)">20</button>
+        <button onclick="sendVote(event, 40)">40</button>
+        <button onclick="sendVote(event, 100)">100</button>
+        <button onclick="sendVote(event, 'coffee ☕')">☕</button>
 
         <div id="userContainer">
             <div
@@ -192,11 +201,12 @@
         <button
             id="resetBtn"
             onclick="resetVotes()"
-            style="display: none;"
+            style="display: none; margin-top: 10px;"
             disabled
-        >Yeniden Başlat</button>
+        >Restart</button>
 
     </div>
 
 </body>
+
 </html>
