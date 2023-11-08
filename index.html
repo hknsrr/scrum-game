@@ -76,8 +76,6 @@
 
         socket.on('updateVotes', function (users, averageVote) {
 
-            console.log(users);
-
             let userList = '';
             for (let userId in users) {
                 userList += `

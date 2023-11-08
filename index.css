@@ -63,7 +63,7 @@ button:hover {
 }
 
 .userCard.voted {
-    border: 2px solid #007bff;
+    border: 5px solid #62da00;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
