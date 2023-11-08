@@ -57,8 +57,8 @@ io.on('connection', (socket) => {
                     console.log(users[userId].vote);
                     if (!isNaN(users[userId].vote)) {
                         totalVotes += users[userId].vote;
+                        userCount++;
                     }
-                    userCount++;
                 }
             }
 
