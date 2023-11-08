@@ -92,6 +92,7 @@ button[disabled] {
     justify-content: space-between;
     align-items: center;
     width: 200px;
+    margin-top: 15px;
 }
 
 .d-none {
