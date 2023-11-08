@@ -15,6 +15,10 @@ body::before {
     /* Font boyutunu değiştirmek isterseniz bu değeri ayarlayabilirsiniz. */
 }
 
+hr {
+    border-color: #989898;
+}
+
 input {
     margin-bottom: 10px;
     background-color: #bdbdbd;
@@ -73,15 +77,21 @@ button[disabled] {
 }
 
 #userContainer {
-    width: 650px;
     height: 300px;
     position: relative;
-    margin: 5% auto;
-    /* border: 2px solid #ddd; */
-    border-radius: 50%;
-    padding: 10px;
     box-sizing: border-box;
-    overflow: visible;
+    margin-top: 30px;
+}
+
+#userContainer:first-child {
+    margin-left: 0px;
+}
+
+.section-master {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 200px;
 }
 
 .d-none {
@@ -97,6 +107,7 @@ button[disabled] {
 .users {
     display: flex;
     flex-wrap: wrap;
+    margin-left: -5px;
 }
 
 .active {

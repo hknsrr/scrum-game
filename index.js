@@ -29,24 +29,40 @@ io.on('connection', (socket) => {
     });
 
     socket.on('vote', ({ room, vote }) => {
-    
+
         if (rooms[room] && rooms[room].users[socket.id]) {
             rooms[room].users[socket.id].vote = vote;
-    
+
             // Eğer tüm kullanıcılar oy kullandıysa Scrum Master'a bildir
             if (Object.values(rooms[room].users).every(user => user.vote !== null)) {
                 io.to(rooms[room].master).emit('allVoted');
             }
-    
+
             // Kullanıcıların güncellenmiş listesini gönder
             io.to(room).emit('updateUsers', rooms[room].users);
         }
     });
-    
+
 
     socket.on('showVotes', room => {
         if (rooms[room] && socket.id === rooms[room].master) {
-            io.to(room).emit('updateVotes', rooms[room].users);
+
+
+            const users = rooms[room].users;
+            let totalVotes = 0;
+            let userCount = 0;
+
+            for (const userId in users) {
+                if (users.hasOwnProperty(userId)) {
+                    totalVotes += users[userId].vote;
+                    userCount++;
+                }
+            }
+
+            // Oy ortalamasını hesapla
+            const averageVote = userCount > 0 ? totalVotes / userCount : 0;
+
+            io.to(room).emit('updateVotes', rooms[room].users, averageVote);
         }
     });
 

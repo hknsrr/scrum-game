@@ -18,6 +18,17 @@
         let currentRoom;
         let isMaster = false;
 
+        window.addEventListener("load", (event) => {
+            const btnInfo = document.getElementById('btnInfo');
+            const sectionInfo = document.getElementById('sectionInfo');
+
+            btnInfo.addEventListener("click", (e) => {
+                sectionInfo.classList.toggle('d-none');
+            });
+        });
+
+
+
 
         function joinRoom() {
             let name = document.getElementById('username').value;
@@ -29,12 +40,16 @@
                 socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster });
 
                 if (isMaster) {
+
+                    document.getElementsByClassName('section-master')[0].classList.remove('d-none');
                     document.getElementById('revealBtn').style.display = 'block';
                     document.getElementById('resetBtn').style.display = 'block'; // Yeniden Başlat butonunu göster
                 }
 
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('gameSection').classList.remove('d-none');
+                document.getElementById('countInfo').classList.remove('d-none');
+                
             } else {
                 alert('ismini ve bağlanmak istediğin odayı gir.');
             }
@@ -59,7 +74,10 @@
 
 
 
-        socket.on('updateVotes', function (users) {
+        socket.on('updateVotes', function (users, averageVote) {
+
+            console.log(users);
+
             let userList = '';
             for (let userId in users) {
                 userList += `
@@ -70,11 +88,14 @@
         `;
             }
             document.getElementById("users").innerHTML = userList;
+            document.getElementById("averageVote").innerHTML = averageVote;
         });
 
 
 
         socket.on('revealVotes', function (users) {
+
+
             let userList = '';
             for (let userId in users) {
                 userList += `
@@ -102,6 +123,7 @@
         `;
             }
             document.getElementById("users").innerHTML = userList;
+            document.getElementById("averageVote").innerHTML = '-';
             // document.getElementById('revealBtn').setAttribute('disabled', true);
         });
 
@@ -130,6 +152,38 @@
 </head>
 
 <body>
+
+
+    <div style="position: fixed;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
+">
+        <button
+            type="button"
+            id="btnInfo"
+            style="position: absolute; top: 0; right:0;"
+        >❔</button>
+        <ul
+            id="sectionInfo"
+            class="d-none"
+            style="border: 1px solid;border: 1px solid;
+            background: #b3b3b3;line-height: 20px;"
+        >
+            <li>0 -> backlog'a geri belli degil</li>
+            <li>1 -> yarim saatlik is</li>
+            <li>2 -> 1 gunluk</li>
+            <li>3 -> 3 gunluk is</li>
+            <li>5 -> 1 haftalik is</li>
+            <li>8 -> 1 sprintlik is</li>
+            <li>13 -> 1 sprintte kolay bitmez zorlarsak belki bitebilir</li>
+            <li>20 -> ne yapacagimiz belli, fakat cok is var dolayisa 1 sprintte bitmez bunu bolelim</li>
+            <li>40 -> hem is buyuk hem ne yapacagimiz cok belli degil</li>
+            <li>100 -> bu acayip buyuk bir yeni proje bu ise hic girmeyelim, yada biz bunu hic anlamadik.</li>
+        </ul>
+    </div>
+
+
     <div
         class="join-section"
         id="joinSection"
@@ -161,13 +215,22 @@
                 id="isMaster"
             >
         </div>
-        <button onclick="joinRoom()">Join Room</button>
+        <button
+            onclick="joinRoom()"
+            style="width: 100px;"
+        >Join Room</button>
     </div>
 
-    <div
-        id="userCount"
-        style="margin: 10px 0px;"
-    >Total Users: 0</div>
+    <div id="countInfo" class="d-none">
+        <div
+            id="userCount"
+            style="margin: 10px 0px;"
+        >Total Users: 0</div>
+
+        <div style="margin: 10px 0px;">Average of Votes: <span id="averageVote">-</span></div>
+    </div>
+
+    <hr>
 
     <div
         id="gameSection"
@@ -185,6 +248,24 @@
         <button onclick="sendVote(event, 40)">40</button>
         <button onclick="sendVote(event, 100)">100</button>
         <button onclick="sendVote(event, 'coffee ☕')">☕</button>
+        <hr>
+
+        <div class="section-master d-none">
+            <button
+                id="revealBtn"
+                onclick="showVotes()"
+                style="display: none;"
+            >Reveal Votes</button>
+
+            <button
+                id="resetBtn"
+                onclick="resetVotes()"
+                style="display: none;"
+                disabled
+            >Restart</button>
+        </div>
+
+
 
         <div id="userContainer">
             <div
@@ -192,18 +273,7 @@
                 id="users"
             ></div>
         </div>
-        <button
-            id="revealBtn"
-            onclick="showVotes()"
-            style="display: none;"
-        >Reveal Votes</button>
 
-        <button
-            id="resetBtn"
-            onclick="resetVotes()"
-            style="display: none; margin-top: 10px;"
-            disabled
-        >Restart</button>
 
     </div>
 
