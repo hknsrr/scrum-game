@@ -54,12 +54,14 @@ io.on('connection', (socket) => {
 
             for (const userId in users) {
                 if (users.hasOwnProperty(userId)) {
-                    totalVotes += users[userId].vote;
+                    console.log(users[userId].vote);
+                    if (!isNaN(users[userId].vote)) {
+                        totalVotes += users[userId].vote;
+                    }
                     userCount++;
                 }
             }
 
-            // Oy ortalamasını hesapla
             const averageVote = userCount > 0 ? totalVotes / userCount : 0;
 
             io.to(room).emit('updateVotes', rooms[room].users, averageVote);
