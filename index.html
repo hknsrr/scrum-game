@@ -110,6 +110,10 @@
             // document.getElementById('revealBtn').removeAttribute('disabled');
         });
 
+        socket.on('pulseDetected', function () {
+            console.log('pulseDetected');
+        });
+
         socket.on('votesReset', function (users) {
             let userList = '';
             for (let userId in users) {
@@ -146,6 +150,11 @@
             document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
             socket.emit('resetVotes', currentRoom);
         }
+
+
+        setInterval(() => {
+            socket.emit('pulseDetect', currentRoom);
+        }, 60000);
     </script>
 </head>
 
@@ -156,6 +165,7 @@
     top: 10px;
     right: 10px;
     font-size: 14px;
+    z-index: 99;
 ">
         <button
             type="button"
@@ -192,6 +202,7 @@
             <input
                 type="text"
                 id="username"
+                
                 required
             >
         </div>
@@ -201,6 +212,7 @@
             <input
                 type="text"
                 id="room"
+                value="ecm"
                 required
             >
         </div>
@@ -245,8 +257,10 @@
         <button onclick="sendVote(event, 20)">20</button>
         <button onclick="sendVote(event, 40)">40</button>
         <button onclick="sendVote(event, 100)">100</button>
+        <span>|</span>
         <button onclick="sendVote(event, 'coffee ☕')">coffee ☕</button>
         <button onclick="sendVote(event, 'wc 🛀')">wc 🛀</button>
+        <button onclick="sendVote(event, 'cigarette 🚬')">cigarette 🚬</button>
         <hr>
 
         <div class="section-master d-none">

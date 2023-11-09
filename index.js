@@ -16,6 +16,7 @@ app.use(express.static(path.join(__dirname, '/')));
 io.on('connection', (socket) => {
 
     socket.on('joinRoom', ({ room, name, isMaster }) => {
+
         socket.join(room);
         if (!rooms[room]) rooms[room] = { master: null, users: {} };
 
@@ -47,14 +48,12 @@ io.on('connection', (socket) => {
     socket.on('showVotes', room => {
         if (rooms[room] && socket.id === rooms[room].master) {
 
-
             const users = rooms[room].users;
             let totalVotes = 0;
             let userCount = 0;
 
             for (const userId in users) {
                 if (users.hasOwnProperty(userId)) {
-                    console.log(users[userId].vote);
                     if (!isNaN(users[userId].vote)) {
                         totalVotes += users[userId].vote;
                         userCount++;
@@ -64,7 +63,14 @@ io.on('connection', (socket) => {
 
             const averageVote = userCount > 0 ? totalVotes / userCount : 0;
 
-            io.to(room).emit('updateVotes', rooms[room].users, averageVote);
+            io.to(room).emit('updateVotes', rooms[room].users, averageVote.toFixed(2));
+        }
+    });
+
+    socket.on('pulseDetect', (room) => {
+        // console.log('pulseDetect');
+        if (rooms[room]) {
+            io.to(room).emit('pulseDetected');
         }
     });
 
