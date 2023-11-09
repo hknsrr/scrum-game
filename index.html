@@ -14,6 +14,7 @@
     >
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        
         let socket = io.connect('/');
         let currentRoom;
         let isMaster = false;
@@ -26,9 +27,6 @@
                 sectionInfo.classList.toggle('d-none');
             });
         });
-
-
-
 
         function joinRoom() {
             let name = document.getElementById('username').value;
@@ -80,39 +78,18 @@
             for (let userId in users) {
                 userList += `
             <div class="userCard ${users[userId].vote !== null ? 'voted' : ''}">
-                <h3>${users[userId].name}</h3>
+                <h3>${users[userId].name} ${users[userId].isWinner ? '🏆' : ''}</h3>
                 <p>${users[userId].vote}</p>
             </div>
         `;
             }
             document.getElementById("users").innerHTML = userList;
-            document.getElementById("averageVote").innerHTML = averageVote;
+            document.getElementById("averageVote").innerText = averageVote;
         });
 
-
-
-        socket.on('revealVotes', function (users) {
-
-
-            let userList = '';
-            for (let userId in users) {
-                userList += `
-            <div class="userCard">
-                <h3>${users[userId].name}</h3>
-                <p>${users[userId].vote || 'Not voted'}</p>
-            </div>
-        `;
-            }
-            document.getElementById("users").innerHTML = userList;
-        });
-
-        socket.on('allVoted', function () {
-            // document.getElementById('revealBtn').removeAttribute('disabled');
-        });
-
-        socket.on('pulseDetected', function () {
-            console.log('pulseDetected');
-        });
+        // socket.on('pulseDetected', function () {
+        //     // console.log('pulseDetected');
+        // });
 
         socket.on('votesReset', function (users) {
             let userList = '';
@@ -125,12 +102,11 @@
         `;
             }
             document.getElementById("users").innerHTML = userList;
-            document.getElementById("averageVote").innerHTML = '-';
+            document.getElementById("averageVote").innerText = '-';
             // document.getElementById('revealBtn').setAttribute('disabled', true);
         });
 
         function sendVote(e, vote) {
-
 
             let voteButtons = document.querySelectorAll('.game-section button');
             voteButtons.forEach(button => {
@@ -155,6 +131,7 @@
         setInterval(() => {
             socket.emit('pulseDetect', currentRoom);
         }, 60000);
+
     </script>
 </head>
 
@@ -202,7 +179,6 @@
             <input
                 type="text"
                 id="username"
-                
                 required
             >
         </div>
