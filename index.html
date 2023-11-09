@@ -14,7 +14,7 @@
     >
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        
+
         let socket = io.connect('/');
         let currentRoom;
         let isMaster = false;
@@ -47,7 +47,7 @@
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('gameSection').classList.remove('d-none');
                 document.getElementById('countInfo').classList.remove('d-none');
-                
+
             } else {
                 alert('ismini ve bağlanmak istediğin odayı gir.');
             }
@@ -133,9 +133,55 @@
         }, 60000);
 
     </script>
+
+    <script>
+        // Resmi gizleme fonksiyonu
+        function hideImage() {
+            document.getElementById('ali2').style.display = 'none';
+            // Resmi tekrar göstermek için random bir zaman aralığı belirle (2 saniye ile 10 saniye arasında)
+            setTimeout(showImage, Math.random() * 8000 + 2000);
+        }
+
+        // Resmi gösterme fonksiyonu
+        function showImage() {
+            document.getElementById('ali2').style.display = 'block';
+            // Resmi yarım saniye sonra tekrar gizle
+            setTimeout(hideImage, 500);
+        }
+
+        setInterval(() => {
+            document.getElementById('ali3').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('ali3').style.display = 'none';
+            }, 500);
+        }, 3000);
+
+        // İlk gösterim için 2 saniye sonra başlat
+        setTimeout(showImage, 1000);
+    </script>
+
+
 </head>
 
 <body>
+
+    <img
+        src="ali1.jpg"
+        class="ali"
+    />
+
+    <img
+        src="ali2.jpg"
+        id="ali2"
+        class="ali"
+    />
+
+    <img
+        src="ali3.jpg"
+        id="ali3"
+        class="ali"
+        style="display: none;"
+    />
 
 
     <div style="position: fixed;
@@ -207,7 +253,10 @@
         >Join Room</button>
     </div>
 
-    <div id="countInfo" class="d-none">
+    <div
+        id="countInfo"
+        class="d-none"
+    >
         <div
             id="userCount"
             style="margin: 10px 0px;"

@@ -115,3 +115,11 @@ button[disabled] {
     background-color: #62da00;
     padding: 15px;
 }
+
+.ali {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 999;
+    width: 25%;
+}
