@@ -85,11 +85,13 @@ io.on('connection', (socket) => {
                 if (users.hasOwnProperty(userId)) {
 
                     const average = averageVote;
-                    const tolerance = 1;
+                    const tolerance = 0.75;
                     const newNumber = users[userId].vote;
 
                     if (isWithinRange(newNumber, average, tolerance)) {
                         users[userId].isWinner = true;
+                    } else {
+                        users[userId].isWinner = false;
                     }
 
                 }
