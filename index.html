@@ -149,8 +149,16 @@
     </script>
 
     <script>
+
         // Resmi gizleme fonksiyonu
         function hideImage() {
+
+
+            // var image = document.getElementById('ali1');
+            // var style = window.getComputedStyle(image);
+            // if (parseFloat(style.opacity) > 0.75) {
+            // }
+
             document.getElementById('ali2').style.display = 'none';
             // Resmi tekrar göstermek için random bir zaman aralığı belirle (2 saniye ile 10 saniye arasında)
             setTimeout(showImage, Math.random() * 8000 + 2000);
@@ -158,16 +166,26 @@
 
         // Resmi gösterme fonksiyonu
         function showImage() {
-            document.getElementById('ali2').style.display = 'block';
+
+            var image = document.getElementById('ali1');
+            var style = window.getComputedStyle(image);
+            if (parseFloat(style.opacity) > 0.75) {
+                document.getElementById('ali2').style.display = 'block';
+            }
             // Resmi yarım saniye sonra tekrar gizle
             setTimeout(hideImage, 500);
         }
 
         setInterval(() => {
-            document.getElementById('ali3').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('ali3').style.display = 'none';
-            }, 500);
+            var image = document.getElementById('ali1');
+            var style = window.getComputedStyle(image);
+            if (parseFloat(style.opacity) > 0.75) {
+                document.getElementById('ali3').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('ali3').style.display = 'none';
+                }, 500);
+            }
+
         }, 3000);
 
         // İlk gösterim için 2 saniye sonra başlat
@@ -188,17 +206,20 @@
     <img
         src="ali1.jpg"
         class="ali"
+        id="ali1"
     />
 
     <img
         src="ali2.jpg"
         id="ali2"
+        style="display: none;"
         class="ali"
     />
 
     <img
         src="ali3.jpg"
         id="ali3"
+        style="display: none;"
         class="ali"
     />
 
