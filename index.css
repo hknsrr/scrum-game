@@ -123,3 +123,14 @@ button[disabled] {
     z-index: 999;
     width: 25%;
 }
+
+
+
+.visible {
+    transition: opacity 15s;
+}
+
+.hidden {
+    opacity: 0;
+    transition: opacity 30s
+}

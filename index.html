@@ -125,6 +125,18 @@
         function resetVotes() {
             document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
             socket.emit('resetVotes', currentRoom);
+
+            var images = document.querySelectorAll('.ali');
+            images.forEach(function (img) {
+                img.classList.remove('hidden');
+                img.classList.add('visible'); // Opaklığı 0'a düşür
+            });
+
+            setTimeout(() => {
+                images.forEach(function (img) {
+                    img.classList.add('hidden'); // Opaklığı 0'a düşür
+                });
+            }, 30000);
         }
 
 
@@ -158,6 +170,12 @@
 
         // İlk gösterim için 2 saniye sonra başlat
         setTimeout(showImage, 1000);
+
+
+
+
+
+
     </script>
 
 
@@ -167,19 +185,19 @@
 
     <img
         src="ali1.jpg"
-        class="ali"
+        class="ali hidden"
     />
 
     <img
         src="ali2.jpg"
         id="ali2"
-        class="ali"
+        class="ali hidden"
     />
 
     <img
         src="ali3.jpg"
         id="ali3"
-        class="ali"
+        class="ali hidden"
         style="display: none;"
     />
 
