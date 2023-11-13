@@ -180,9 +180,9 @@
             var image = document.getElementById('ali1');
             var style = window.getComputedStyle(image);
             if (parseFloat(style.opacity) > 0.75) {
-                document.getElementById('ali3').style.display = 'block';
+                document.getElementById('ali2').style.display = 'block';
                 setTimeout(() => {
-                    document.getElementById('ali3').style.display = 'none';
+                    document.getElementById('ali2').style.display = 'none';
                 }, 500);
             }
 
@@ -204,21 +204,14 @@
 <body>
 
     <img
-        src="ali1.jpg"
+        src="ali1.png"
         class="ali"
         id="ali1"
     />
 
     <img
-        src="ali2.jpg"
+        src="ali2.png"
         id="ali2"
-        style="display: none;"
-        class="ali"
-    />
-
-    <img
-        src="ali3.jpg"
-        id="ali3"
         style="display: none;"
         class="ali"
     />
