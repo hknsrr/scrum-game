@@ -87,6 +87,33 @@
             document.getElementById("averageVote").innerText = averageVote;
         });
 
+
+        socket.on('a', function () {
+
+            const body = document.body;
+            const bodyWidth = window.innerWidth;
+            const bodyHeight = window.innerHeight;
+
+            for (let i = 0; i < 500; i++) {
+                setTimeout(function () {
+                    const img = document.createElement('img');
+                    img.src = 'ali3.jpg';
+                    img.classList.add('random-image');
+
+                    // Rastgele konum
+                    const x = Math.random() * bodyWidth;
+                    const y = Math.random() * bodyHeight;
+                    img.style.left = x + 'px';
+                    img.style.top = y + 'px';
+
+                    body.appendChild(img);
+                }, i * 100);
+            }
+        });
+
+
+
+
         // socket.on('pulseDetected', function () {
         //     // console.log('pulseDetected');
         // });

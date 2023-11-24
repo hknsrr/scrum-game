@@ -105,6 +105,19 @@ io.on('connection', (socket) => {
 
     });
 
+    socket.on('a', (room) => {
+
+        room = encodeHTML(room);
+
+        if (rooms[room]) {
+            for (let userId in rooms[room].users) {
+                rooms[room].users[userId].vote = null;
+            }
+            io.to(room).emit('a', rooms[room].users);
+        }
+
+    });
+
     socket.on('disconnect', () => {
         for (let room in rooms) {
             if (rooms[room].users[socket.id]) {
