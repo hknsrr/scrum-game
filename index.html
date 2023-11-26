@@ -3,11 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-    <title>Scrum Poker</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agile Scrum Master Game - Free Online Collaborative Tool</title>
+    <meta name="description" content="Engage in interactive, fun, and effective Scrum planning with our free online Agile Scrum Master Game. Perfect for remote teams, this tool simplifies your Agile estimation and planning process.">
+    <meta name="keywords" content="Scrum Game, Agile Planning Tool, Free Scrum Master Game, Online Estimation Tool, Agile Project Management, Scrum Planning Poker, Agile Collaboration Tool">
+    <meta name="author" content="Hakan SARIER">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://scrum-oiyf.onrender.com/">
+    <meta property="og:title" content="Agile Scrum Master Game - Free Online Collaborative Tool">
+    <meta property="og:description" content="Interactive and engaging Scrum planning tool for Agile teams. Simplify your estimation process with our free online game.">
+    <!-- <meta property="og:image" content="https://scrum-oiyf.onrender.com/image.jpg"> -->
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://scrum-oiyf.onrender.com/">
+    <meta property="twitter:title" content="Agile Scrum Master Game - Free Online Collaborative Tool">
+    <meta property="twitter:description" content="Interactive and engaging Scrum planning tool for Agile teams. Simplify your estimation process with our free online game.">
+    <!-- <meta property="twitter:image" content="https://scrum-oiyf.onrender.com/image.jpg"> -->
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.png">
     <link
         rel="stylesheet"
         href="index.css"
@@ -132,17 +150,6 @@
             document.getElementById("averageVote").innerText = '-';
             // document.getElementById('revealBtn').setAttribute('disabled', true);
 
-            var images = document.querySelectorAll('.ali');
-            images.forEach(function (img) {
-
-                img.classList.add('visible'); // Opaklığı 0'a düşür
-            });
-
-            setTimeout(() => {
-                images.forEach(function (img) {
-                    img.classList.remove('visible');
-                });
-            }, 30000);
         });
 
         function sendVote(e, vote) {
@@ -175,73 +182,11 @@
 
     </script>
 
-    <script>
-
-        // Resmi gizleme fonksiyonu
-        function hideImage() {
-
-
-            // var image = document.getElementById('ali1');
-            // var style = window.getComputedStyle(image);
-            // if (parseFloat(style.opacity) > 0.75) {
-            // }
-
-            document.getElementById('ali2').style.display = 'none';
-            // Resmi tekrar göstermek için random bir zaman aralığı belirle (2 saniye ile 10 saniye arasında)
-            setTimeout(showImage, Math.random() * 8000 + 2000);
-        }
-
-        // Resmi gösterme fonksiyonu
-        function showImage() {
-
-            var image = document.getElementById('ali1');
-            var style = window.getComputedStyle(image);
-            if (parseFloat(style.opacity) > 0.75) {
-                document.getElementById('ali2').style.display = 'block';
-            }
-            // Resmi yarım saniye sonra tekrar gizle
-            setTimeout(hideImage, 500);
-        }
-
-        setInterval(() => {
-            var image = document.getElementById('ali1');
-            var style = window.getComputedStyle(image);
-            if (parseFloat(style.opacity) > 0.75) {
-                document.getElementById('ali2').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('ali2').style.display = 'none';
-                }, 500);
-            }
-
-        }, 3000);
-
-        // İlk gösterim için 2 saniye sonra başlat
-        setTimeout(showImage, 1000);
-
-
-
-
-
-
-    </script>
-
 
 </head>
 
 <body>
 
-    <img
-        src="ali1.png"
-        class="ali"
-        id="ali1"
-    />
-
-    <img
-        src="ali2.png"
-        id="ali2"
-        style="display: none;"
-        class="ali"
-    />
 
 
     <div style="position: fixed;
