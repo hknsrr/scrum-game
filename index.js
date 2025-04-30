@@ -68,27 +68,22 @@ io.on('connection', (socket) => {
 
             const users = rooms[room].users;
             let totalVotes = 0;
-            let userCount = 0;
 
             for (const userId in users) {
                 if (users.hasOwnProperty(userId)) {
                     if (!isNaN(users[userId].vote) && users[userId].vote) {
-                        totalVotes += parseFloat(users[userId].vote, 2);
-                        userCount++;
+                        totalVotes ++;
                     }
                 }
             }
 
-            const averageVote = userCount > 0 ? totalVotes / userCount : 0;
-
             for (const userId in users) {
                 if (users.hasOwnProperty(userId)) {
 
-                    const average = averageVote;
                     const tolerance = 0.75;
                     const newNumber = users[userId].vote;
 
-                    if (isWithinRange(newNumber, average, tolerance)) {
+                    if (isWithinRange(newNumber, tolerance)) {
                         users[userId].isWinner = true;
                     } else {
                         users[userId].isWinner = false;
@@ -97,7 +92,7 @@ io.on('connection', (socket) => {
                 }
             }
 
-            io.to(room).emit('updateVotes', rooms[room].users, averageVote.toFixed(2));
+            io.to(room).emit('updateVotes', rooms[room].users, totalVotes);
         }
     });
 

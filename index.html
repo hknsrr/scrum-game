@@ -3,29 +3,72 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        http-equiv="X-UA-Compatible"
+        content="IE=edge"
+    >
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
     <title>Agile Scrum Master Game - Free Online Collaborative Tool</title>
-    <meta name="description" content="Engage in interactive, fun, and effective Scrum planning with our free online Agile Scrum Master Game. Perfect for remote teams, this tool simplifies your Agile estimation and planning process.">
-    <meta name="keywords" content="Scrum Game, Agile Planning Tool, Free Scrum Master Game, Online Estimation Tool, Agile Project Management, Scrum Planning Poker, Agile Collaboration Tool">
-    <meta name="author" content="Hakan SARIER">
+    <meta
+        name="description"
+        content="Engage in interactive, fun, and effective Scrum planning with our free online Agile Scrum Master Game. Perfect for remote teams, this tool simplifies your Agile estimation and planning process."
+    >
+    <meta
+        name="keywords"
+        content="Scrum Game, Agile Planning Tool, Free Scrum Master Game, Online Estimation Tool, Agile Project Management, Scrum Planning Poker, Agile Collaboration Tool"
+    >
+    <meta
+        name="author"
+        content="Hakan SARIER"
+    >
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://scrum-oiyf.onrender.com/">
-    <meta property="og:title" content="Agile Scrum Master Game - Free Online Collaborative Tool">
-    <meta property="og:description" content="Interactive and engaging Scrum planning tool for Agile teams. Simplify your estimation process with our free online game.">
+    <meta
+        property="og:type"
+        content="website"
+    >
+    <meta
+        property="og:url"
+        content="https://scrum-oiyf.onrender.com/"
+    >
+    <meta
+        property="og:title"
+        content="Agile Scrum Master Game - Free Online Collaborative Tool"
+    >
+    <meta
+        property="og:description"
+        content="Interactive and engaging Scrum planning tool for Agile teams. Simplify your estimation process with our free online game."
+    >
     <!-- <meta property="og:image" content="https://scrum-oiyf.onrender.com/image.jpg"> -->
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://scrum-oiyf.onrender.com/">
-    <meta property="twitter:title" content="Agile Scrum Master Game - Free Online Collaborative Tool">
-    <meta property="twitter:description" content="Interactive and engaging Scrum planning tool for Agile teams. Simplify your estimation process with our free online game.">
+    <meta
+        property="twitter:card"
+        content="summary_large_image"
+    >
+    <meta
+        property="twitter:url"
+        content="https://scrum-oiyf.onrender.com/"
+    >
+    <meta
+        property="twitter:title"
+        content="Agile Scrum Master Game - Free Online Collaborative Tool"
+    >
+    <meta
+        property="twitter:description"
+        content="Interactive and engaging Scrum planning tool for Agile teams. Simplify your estimation process with our free online game."
+    >
     <!-- <meta property="twitter:image" content="https://scrum-oiyf.onrender.com/image.jpg"> -->
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="favicon.png">
+    <link
+        rel="icon"
+        type="image/x-icon"
+        href="favicon.png"
+    >
     <link
         rel="stylesheet"
         href="index.css"
@@ -37,14 +80,14 @@
         let currentRoom;
         let isMaster = false;
 
-        window.addEventListener("load", (event) => {
-            const btnInfo = document.getElementById('btnInfo');
-            const sectionInfo = document.getElementById('sectionInfo');
+        // window.addEventListener("load", (event) => {
+        //     const btnInfo = document.getElementById('btnInfo');
+        //     const sectionInfo = document.getElementById('sectionInfo');
 
-            btnInfo.addEventListener("click", (e) => {
-                sectionInfo.classList.toggle('d-none');
-            });
-        });
+        //     btnInfo.addEventListener("click", (e) => {
+        //         sectionInfo.classList.toggle('d-none');
+        //     });
+        // });
 
         function joinRoom() {
             let name = document.getElementById('username').value;
@@ -77,7 +120,7 @@
 
             Object.values(users).forEach((user) => {
                 userList += `
-            <div class="userCard">
+            <div class="userCard ${user.vote !== null ? 'voted' : ''}">
                 <h3>${user.name}</h3>
                 <p>${user.vote !== null ? 'Voted' : 'Not voted'}</p>
             </div>
@@ -85,15 +128,16 @@
             });
 
             document.getElementById("users").innerHTML = userList;
-            document.getElementById("userCount").innerText = `Total Users: ${userCount}`;
+            document.getElementById("userCount").innerText = `Participants: ${userCount}`;
         });
 
 
 
-        socket.on('updateVotes', function (users, averageVote) {
+        socket.on('updateVotes', function (users, voters) {
 
             let userList = '';
             for (let userId in users) {
+                
                 userList += `
             <div class="userCard ${users[userId].vote !== null ? 'voted' : ''}">
                 <h3>${users[userId].name} ${users[userId].isWinner ? '🏆' : ''}</h3>
@@ -102,39 +146,13 @@
         `;
             }
             document.getElementById("users").innerHTML = userList;
-            document.getElementById("averageVote").innerText = averageVote;
+            // document.getElementById("averageVote").innerText = averageVote;
+            document.getElementById("voters").innerText = voters;
         });
 
-
-        socket.on('a', function () {
-
-            const body = document.body;
-            const bodyWidth = window.innerWidth;
-            const bodyHeight = window.innerHeight;
-
-            for (let i = 0; i < 500; i++) {
-                setTimeout(function () {
-                    const img = document.createElement('img');
-                    img.src = 'ali3.jpg';
-                    img.classList.add('random-image');
-
-                    // Rastgele konum
-                    const x = Math.random() * bodyWidth;
-                    const y = Math.random() * bodyHeight;
-                    img.style.left = x + 'px';
-                    img.style.top = y + 'px';
-
-                    body.appendChild(img);
-                }, i * 100);
-            }
+        socket.on('pulseDetected', function () {
+            console.log('pulseDetected');
         });
-
-
-
-
-        // socket.on('pulseDetected', function () {
-        //     // console.log('pulseDetected');
-        // });
 
         socket.on('votesReset', function (users) {
             let userList = '';
@@ -147,7 +165,8 @@
         `;
             }
             document.getElementById("users").innerHTML = userList;
-            document.getElementById("averageVote").innerText = '-';
+            // document.getElementById("averageVote").innerText = '-';
+            document.getElementById("voters").innerText = '0';
             // document.getElementById('revealBtn').setAttribute('disabled', true);
 
         });
@@ -170,6 +189,12 @@
 
         function resetVotes() {
             document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
+
+            let voteButtons = document.querySelectorAll('.game-section button');
+            voteButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
             socket.emit('resetVotes', currentRoom);
 
 
@@ -178,7 +203,7 @@
 
         setInterval(() => {
             socket.emit('pulseDetect', currentRoom);
-        }, 60000);
+        }, 15000);
 
     </script>
 
@@ -186,39 +211,6 @@
 </head>
 
 <body>
-
-
-
-    <div style="position: fixed;
-    top: 10px;
-    right: 10px;
-    font-size: 14px;
-    z-index: 99;
-">
-        <button
-            type="button"
-            id="btnInfo"
-            style="position: absolute; top: 0; right:0;"
-        >❔</button>
-        <ul
-            id="sectionInfo"
-            class="d-none"
-            style="border: 1px solid;border: 1px solid;
-            background: #b3b3b3;line-height: 20px;"
-        >
-            <li>0 -> backlog'a geri belli degil</li>
-            <li>1 -> yarim saatlik is</li>
-            <li>2 -> 1 gunluk</li>
-            <li>3 -> 3 gunluk is</li>
-            <li>5 -> 1 haftalik is</li>
-            <li>8 -> 1 sprintlik is</li>
-            <li>13 -> 1 sprintte kolay bitmez zorlarsak belki bitebilir</li>
-            <li>20 -> ne yapacagimiz belli, fakat cok is var dolayisa 1 sprintte bitmez bunu bolelim</li>
-            <li>40 -> hem is buyuk hem ne yapacagimiz cok belli degil</li>
-            <li>100 -> bu acayip buyuk bir yeni proje bu ise hic girmeyelim, yada biz bunu hic anlamadik.</li>
-        </ul>
-    </div>
-
 
     <div
         class="join-section"
@@ -265,9 +257,11 @@
         <div
             id="userCount"
             style="margin: 10px 0px;"
-        >Total Users: 0</div>
+        >Participants: 0</div>
 
-        <div style="margin: 10px 0px;">Average of Votes: <span id="averageVote">-</span></div>
+        <!-- <div style="margin: 10px 0px;">Average of Votes: <span id="averageVote">-</span></div> -->
+
+        <div style="margin: 10px 0px;">Voters: <span id="voters">0</span></div>
     </div>
 
     <hr>
@@ -277,20 +271,17 @@
         class="game-section d-none"
     >
         <button onclick="sendVote(event, 0)">0</button>
-        <button onclick="sendVote(event, 0.5)">1/2</button>
         <button onclick="sendVote(event, 1)">1</button>
         <button onclick="sendVote(event, 2)">2</button>
         <button onclick="sendVote(event, 3)">3</button>
         <button onclick="sendVote(event, 5)">5</button>
         <button onclick="sendVote(event, 8)">8</button>
         <button onclick="sendVote(event, 13)">13</button>
-        <button onclick="sendVote(event, 20)">20</button>
-        <button onclick="sendVote(event, 40)">40</button>
-        <button onclick="sendVote(event, 100)">100</button>
-        <span>|</span>
+        <button onclick="sendVote(event, 21)">21</button>
+        <span style="margin-left: 5px;">|</span>
         <button onclick="sendVote(event, 'coffee ☕')">coffee ☕</button>
         <button onclick="sendVote(event, 'wc 🛀')">wc 🛀</button>
-        <button onclick="sendVote(event, 'cigarette 🚬')">cigarette 🚬</button>
+        <button onclick="sendVote(event, 'away 💻')">away 💻</button>
         <hr>
 
         <div class="section-master d-none">
