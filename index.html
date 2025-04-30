@@ -137,11 +137,11 @@
 
             let userList = '';
             for (let userId in users) {
-                
+
                 userList += `
             <div class="userCard ${users[userId].vote !== null ? 'voted' : ''}">
                 <h3>${users[userId].name} ${users[userId].isWinner ? '🏆' : ''}</h3>
-                <p>${users[userId].vote}</p>
+                <p>${users[userId].vote !== null ? users[userId].vote : '🥺'}</p>
             </div>
         `;
             }
@@ -169,6 +169,13 @@
             document.getElementById("voters").innerText = '0';
             // document.getElementById('revealBtn').setAttribute('disabled', true);
 
+            document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
+
+            let voteButtons = document.querySelectorAll('.game-section button');
+            voteButtons.forEach(button => {
+                button.classList.remove('active');
+            });
+
         });
 
         function sendVote(e, vote) {
@@ -194,7 +201,7 @@
             voteButtons.forEach(button => {
                 button.classList.remove('active');
             });
-            
+
             socket.emit('resetVotes', currentRoom);
 
 
@@ -203,7 +210,9 @@
 
         setInterval(() => {
             socket.emit('pulseDetect', currentRoom);
-        }, 15000);
+        }, 5000);
+
+        // socket.emit('pulseDetect', currentRoom);
 
     </script>
 

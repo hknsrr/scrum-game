@@ -97,7 +97,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('pulseDetect', (room) => {
-
+        io.to(room).emit('pulseDetected'); 
     });
 
     socket.on('a', (room) => {
