@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm run dev)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(timeout:*)",
+      "Bash(dir:*)",
+      "Bash(cp:*)",
+      "Read(//c/Users/Lenovo/OneDrive/Desktop/**)",
+      "Bash(xcopy:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nComplete UI/UX redesign with modern design and enhanced features\n\nMajor Updates:\n- Complete visual redesign with modern, clean interface\n- Enhanced dark mode with smooth transitions\n- Custom avatar selection (10 unique avatars)\n- 6-hour session persistence for seamless user experience\n- 5-minute reconnection grace period\n- Elegant long name handling without truncation\n- Prominent vote display with clean typography\n- Quick return to login functionality\n- Premium button interactions with hover/active states\n- Break and question indicators as avatar badges\n\nTechnical Improvements:\n- Improved CSS architecture with CSS variables\n- Smooth animations using cubic-bezier easing\n- Responsive design optimizations\n- Enhanced user card layout\n- Centered page title regardless of user info size\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git config:*)",
+      "Bash(git push:*)",
+      "Bash(git merge:*)",
+      "Bash(git branch:*)",
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git rm:*)",
+      "Bash(rm:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
