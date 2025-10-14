@@ -876,8 +876,16 @@ hr, .divider {
 }
 
 .userCard.is-away {
-    opacity: 0.5;
-    filter: grayscale(0.6);
+    opacity: 0.75;
+    filter: grayscale(0.2);
+    border-style: dashed;
+    background: linear-gradient(135deg,
+        var(--card-user-bg) 0%,
+        rgba(160, 174, 192, 0.1) 100%);
+}
+
+.userCard.is-away .user-card-avatar {
+    opacity: 0.6;
 }
 
 /* Break/Question Indicators - Positioned on avatar corners */
