@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planning Poker - Game Room</title>
+    <style>
+        /* CSS Variables for Light/Dark Mode */
+        :root {
+            --bg-color: #f5f7fa;
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --button-primary: #667eea;
+            --button-primary-hover: #5568d3;
+            --button-secondary: #48bb78;
+            --button-danger: #f56565;
+            --vote-active: #48bb78;
+            --card-user-bg: #ffffff;
+            --card-voted-border: #48bb78;
+            --card-master-border: #f6ad55;
+            --status-connected: #48bb78;
+            --status-reconnecting: #ecc94b;
+            --status-disconnected: #f56565;
+            --break-indicator: #ed8936;
+            --question-indicator: #4299e1;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --toggle-bg: #cbd5e0;
+            --toggle-active-bg: #667eea;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a202c;
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #a0aec0;
+            --border-color: #4a5568;
+            --button-primary: #667eea;
+            --button-primary-hover: #5568d3;
+            --card-user-bg: #374151;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+            --toggle-bg: #4a5568;
+            --toggle-active-bg: #667eea;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+
+        /* Subtle gradient background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 150%;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            opacity: 0.03;
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Theme Toggle Switch - Fixed Position */
+        .theme-toggle-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .theme-toggle-switch {
+            width: 64px;
+            height: 32px;
+            background: var(--toggle-bg);
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: var(--shadow-md);
+            border: 2px solid var(--border-color);
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(32px);
+        }
+
+        [data-theme="dark"] .theme-toggle-switch {
+            background: var(--toggle-active-bg);
+        }
+
+        /* Header Area */
+        .header-area {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .user-info-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 12px 18px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .user-avatar-display {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 2px solid var(--border-color);
+        }
+
+        .user-details-display {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-details-display h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .user-details-display p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Page Title */
+        .page-title {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 24px 0;
+        }
+
+        /* Voting Controls */
+        .voting-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .voting-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .vote-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .vote-btn {
+            padding: 10px 18px;
+            background: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            min-width: 48px;
+        }
+
+        .vote-btn:hover {
+            background: var(--button-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .vote-btn.active {
+            background: var(--vote-active);
+            transform: scale(1.05);
+        }
+
+        .request-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .request-btn {
+            padding: 10px 16px;
+            background: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            white-space: nowrap;
+        }
+
+        .request-btn:hover {
+            background: var(--button-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .request-btn.active {
+            background: var(--vote-active);
+        }
+
+        /* Master Controls */
+        .master-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .master-btn {
+            padding: 12px 24px;
+            background: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .master-btn:hover {
+            background: var(--button-primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .master-btn:disabled {
+            background: #cbd5e0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .master-btn.danger {
+            background: var(--button-danger);
+        }
+
+        .master-btn.danger:hover:not(:disabled) {
+            background: #e53e3e;
+        }
+
+        /* User Cards Grid */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
+        }
+
+        .user-card {
+            background: var(--card-user-bg);
+            border: 3px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .user-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-card-avatar {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .user-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .user-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .user-card.voted {
+            border-color: var(--card-voted-border);
+            border-width: 3px;
+        }
+
+        .user-card.is-master {
+            border-color: var(--card-master-border);
+            border-width: 3px;
+            background: linear-gradient(135deg, rgba(246, 173, 85, 0.05) 0%, rgba(246, 173, 85, 0.1) 100%);
+        }
+
+        .user-card.is-away {
+            opacity: 0.5;
+            filter: grayscale(0.6);
+        }
+
+        /* Break/Question Indicators */
+        .user-card.has-break::before {
+            content: '☕';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            animation: subtle-pulse 2s ease-in-out infinite;
+        }
+
+        .user-card.has-question::after {
+            content: '❓';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            animation: subtle-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateY(-50%) scale(1.1);
+            }
+        }
+
+        .preview-badge {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .voting-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .request-buttons {
+                justify-content: stretch;
+            }
+
+            .request-btn {
+                flex: 1;
+            }
+
+            .users-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+
+            .page-title h1 {
+                font-size: 24px;
+            }
+
+            .header-area {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-badge">Preview • Lobby</div>
+
+    <div class="theme-toggle-container">
+        <div class="theme-toggle-switch" onclick="toggleTheme()">
+            <div class="theme-toggle-slider">
+                <span id="themeIcon">🌙</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header-area">
+            <div class="user-info-section">
+                <div class="user-avatar-display">👤</div>
+                <div class="user-details-display">
+                    <h2>John Doe</h2>
+                    <p>Room: ECM-Gryffindor</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-title">
+            <h1>Planning Poker</h1>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="voting-section">
+            <div class="voting-controls">
+                <div class="vote-buttons">
+                    <button class="vote-btn" onclick="toggleVote(this)">0</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">1</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">2</button>
+                    <button class="vote-btn active" onclick="toggleVote(this)">3</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">5</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">8</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">13</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">21</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">40</button>
+                    <button class="vote-btn" onclick="toggleVote(this)">☕</button>
+                </div>
+                <div class="request-buttons">
+                    <button class="request-btn" onclick="toggleRequest(this)">
+                        ☕ Break
+                    </button>
+                    <button class="request-btn" onclick="toggleRequest(this)">
+                        ❓ Question
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="master-controls">
+            <button class="master-btn" onclick="alert('Votes Revealed!')">Reveal Votes</button>
+            <button class="master-btn danger" onclick="alert('Votes Reset!')" disabled>Restart</button>
+        </div>
+
+        <div class="users-grid">
+            <!-- Master Card -->
+            <div class="user-card is-master voted">
+                <div class="user-card-avatar">👨‍💼</div>
+                <h3>Alice 👑</h3>
+                <p>Voted</p>
+            </div>
+
+            <!-- Current User - Voted -->
+            <div class="user-card voted">
+                <div class="user-card-avatar">👤</div>
+                <h3>John Doe</h3>
+                <p>Voted</p>
+            </div>
+
+            <!-- User with Break Request -->
+            <div class="user-card voted has-break">
+                <div class="user-card-avatar">👩‍💻</div>
+                <h3>Mary Smith</h3>
+                <p>Voted</p>
+            </div>
+
+            <!-- User with Question -->
+            <div class="user-card has-question">
+                <div class="user-card-avatar">🧑‍💻</div>
+                <h3>Tom Brown</h3>
+                <p>Not voted</p>
+            </div>
+
+            <!-- Away User -->
+            <div class="user-card is-away">
+                <div class="user-card-avatar">🧙‍♂️</div>
+                <h3>Sarah Davis</h3>
+                <p>Away 💻</p>
+            </div>
+
+            <!-- Regular User -->
+            <div class="user-card voted">
+                <div class="user-card-avatar">🦸</div>
+                <h3>Bob Wilson</h3>
+                <p>Voted</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Theme toggle
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeIcon = document.getElementById('themeIcon');
+
+            html.setAttribute('data-theme', newTheme);
+            themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme (default to dark)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const themeIcon = document.getElementById('themeIcon');
+
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+        });
+
+        // Vote button toggle
+        function toggleVote(button) {
+            const isActive = button.classList.contains('active');
+
+            document.querySelectorAll('.vote-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (!isActive) {
+                button.classList.add('active');
+            }
+        }
+
+        // Request button toggle
+        function toggleRequest(button) {
+            button.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
