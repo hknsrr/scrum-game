@@ -135,6 +135,17 @@
                         document.getElementById('username').value = session.name;
                         document.getElementById('room').value = session.room;
                         document.getElementById('isMaster').checked = session.isMaster;
+
+                        // Restore avatar selection
+                        if (session.avatar) {
+                            selectedAvatar = session.avatar;
+                            const avatarRadio = document.querySelector(`input[name="avatar"][value="${session.avatar}"]`);
+                            if (avatarRadio) {
+                                avatarRadio.checked = true;
+                                avatarRadio.closest('.avatar-option').classList.add('selected');
+                            }
+                        }
+
                         return session;
                     } else {
                         // Session süresi dolmuş, temizle
@@ -148,12 +159,13 @@
         }
 
         // Session bilgilerini kaydet
-        function saveSession(room, name, isMaster) {
+        function saveSession(room, name, isMaster, avatar) {
             try {
                 const sessionData = {
                     room: room,
                     name: name,
                     isMaster: isMaster,
+                    avatar: avatar,
                     timestamp: Date.now()
                 };
                 localStorage.setItem('scrumSession', JSON.stringify(sessionData));
@@ -221,7 +233,8 @@
                 socket.emit('joinRoom', {
                     room: currentRoom,
                     name: userName,
-                    isMaster: isMaster
+                    isMaster: isMaster,
+                    avatar: selectedAvatar
                 });
             }
         });
@@ -291,9 +304,9 @@
                 userName = name;
 
                 // Session bilgilerini kaydet
-                saveSession(room, name, isMaster);
+                saveSession(room, name, isMaster, selectedAvatar);
 
-                socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster });
+                socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster, avatar: selectedAvatar });
 
                 if (isMaster) {
                     document.getElementsByClassName('section-master')[0].classList.remove('d-none');
@@ -335,7 +348,7 @@
                 const masterClass = user.isMaster ? 'is-master' : '';
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : (user.vote !== null ? 'Voted' : 'Not voted'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
-                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const userAvatar = user.avatar || '👤';
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
                 <div class="user-card-avatar">${userAvatar}</div>
@@ -374,7 +387,7 @@
                 }
                 const voteDisplay = user.isMaster ? '🥺' : (user.isAway ? '💤' : (user.vote !== null && user.vote !== 'null' ? displayVote : '🥺'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
-                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const userAvatar = user.avatar || '👤';
                 const revealedClass = 'vote-revealed'; // Add special class for revealed votes
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
@@ -411,7 +424,7 @@
                 const masterClass = user.isMaster ? 'is-master' : '';
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : 'Not voted');
                 const masterBadge = user.isMaster ? ' 👑' : '';
-                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const userAvatar = user.avatar || '👤';
                 userList += `
             <div class="userCard ${user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
                 <div class="user-card-avatar">${userAvatar}</div>
