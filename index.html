@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-    <title>Agile Scrum Master Game - Free Online Collaborative Tool</title>
+    <title>Planning Poker - Agile Scrum Estimation Tool</title>
     <meta
         name="description"
         content="Engage in interactive, fun, and effective Scrum planning with our free online Agile Scrum Master Game. Perfect for remote teams, this tool simplifies your Agile estimation and planning process."
@@ -80,7 +80,47 @@
         let currentRoom;
         let isMaster = false;
         let userName = '';
+        let selectedAvatar = '👤'; // Default avatar
         const SESSION_DURATION = 6 * 60 * 60 * 1000; // 6 saat
+
+        // Theme toggle functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const themeIcon = document.getElementById('themeIcon');
+
+            html.setAttribute('data-theme', newTheme);
+            themeIcon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme (default to dark)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const themeIcon = document.getElementById('themeIcon');
+
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            if (themeIcon) {
+                themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+            }
+
+            // Setup avatar selection
+            document.querySelectorAll('.avatar-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.avatar-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                        selectedAvatar = radio.value;
+                    }
+                });
+            });
+        });
 
         // LocalStorage'dan session bilgilerini al
         function loadSession() {
@@ -226,6 +266,21 @@
             }
         }
 
+        // Return to login screen
+        function returnToLogin() {
+            document.getElementById('gameSection').classList.add('d-none');
+            document.getElementById('joinSection').style.display = 'flex';
+            document.getElementById('whatsNewButton').style.display = 'block';
+
+            // Disconnect from current room
+            if (currentRoom) {
+                socket.disconnect();
+                socket.connect();
+            }
+
+            currentRoom = null;
+        }
+
         function joinRoom() {
             let name = document.getElementById('username').value;
             let room = document.getElementById('room').value;
@@ -241,16 +296,18 @@
                 socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster });
 
                 if (isMaster) {
-
                     document.getElementsByClassName('section-master')[0].classList.remove('d-none');
                     document.getElementById('revealBtn').style.display = 'block';
-                    document.getElementById('resetBtn').style.display = 'block'; // Yeniden Başlat butonunu göster
+                    document.getElementById('resetBtn').style.display = 'block';
                 }
+
+                // Update user info display
+                document.getElementById('userAvatarDisplay').textContent = selectedAvatar;
+                document.getElementById('userNameDisplay').textContent = name;
+                document.getElementById('userRoomDisplay').textContent = `Room: ${room}`;
 
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('gameSection').classList.remove('d-none');
-                document.getElementById('countInfo').classList.remove('d-none');
-                document.getElementById('connectionStatus').classList.remove('d-none');
 
                 // Hide What's New button when entering room
                 document.getElementById('whatsNewButton').style.display = 'none';
@@ -278,8 +335,10 @@
                 const masterClass = user.isMaster ? 'is-master' : '';
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? 'Away 💻' : (user.vote !== null ? 'Voted' : 'Not voted'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
+                const userAvatar = user.name === userName ? selectedAvatar : '👤';
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
+                <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge}</h3>
                 <p>${voteDisplay}</p>
             </div>
@@ -311,10 +370,13 @@
                 // Master always shows emoji
                 const voteDisplay = user.isMaster ? '🥺' : (user.isAway ? 'Away 💻' : (user.vote !== null && user.vote !== 'null' ? user.vote : '🥺'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
+                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const revealedClass = 'vote-revealed'; // Add special class for revealed votes
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
+                <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge} ${user.isWinner ? '🏆' : ''}</h3>
-                <p>${voteDisplay}</p>
+                <p class="${revealedClass}">${voteDisplay}</p>
             </div>
         `;
             });
@@ -345,8 +407,10 @@
                 const masterClass = user.isMaster ? 'is-master' : '';
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? 'Away 💻' : 'Not voted');
                 const masterBadge = user.isMaster ? ' 👑' : '';
+                const userAvatar = user.name === userName ? selectedAvatar : '👤';
                 userList += `
             <div class="userCard ${user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
+                <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge}</h3>
                 <p>${voteDisplay}</p>
             </div>
@@ -445,49 +509,94 @@
 
 <body>
 
-    <div
-        class="join-section"
-        id="joinSection"
-    >
-        <div>
-
-            <label for="username">Name:</label>
-            <input
-                type="text"
-                id="username"
-                required
-            >
+    <!-- Theme Toggle (Fixed position, always visible) -->
+    <div class="theme-toggle-container">
+        <div class="theme-toggle-switch" onclick="toggleTheme()">
+            <div class="theme-toggle-slider">
+                <span id="themeIcon">🌙</span>
+            </div>
         </div>
-        <div>
+    </div>
 
-            <label for="room">Room:</label>
-            <input
-                type="text"
-                id="room"
-                value="ecm"
-                required
-            >
+    <!-- Join Section (Login Screen) -->
+    <div class="join-section" id="joinSection">
+        <div class="join-container">
+            <div class="join-header">
+                <h1>Planning Poker</h1>
+                <p>Join a room to start planning</p>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Your Name</label>
+                <input type="text" id="username" placeholder="Enter your name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="room">Room Name</label>
+                <input type="text" id="room" value="ecm" placeholder="Enter room name" required>
+            </div>
+
+            <div class="recommended-rooms-container">
+                <label>Recommended Rooms</label>
+                <div class="room-chips">
+                    <button class="room-chip" onclick="selectRoom('ECM-Gryffindor')">ECM-Gryffindor</button>
+                    <button class="room-chip" onclick="selectRoom('ECM-Hufflepuff')">ECM-Hufflepuff</button>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="isMaster">
+                <label for="isMaster">Join as Scrum Master</label>
+            </div>
+
+            <div class="avatar-section">
+                <span class="avatar-section-label">Choose Avatar</span>
+                <div class="avatar-grid">
+                    <label class="avatar-option selected">
+                        <input type="radio" name="avatar" value="👤" checked>
+                        <span>👤</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="👨‍💼">
+                        <span>👨‍💼</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="👩‍💻">
+                        <span>👩‍💻</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🧑‍💻">
+                        <span>🧑‍💻</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🧙‍♂️">
+                        <span>🧙‍♂️</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🦸">
+                        <span>🦸</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🐱">
+                        <span>🐱</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🐶">
+                        <span>🐶</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🦁">
+                        <span>🦁</span>
+                    </label>
+                    <label class="avatar-option">
+                        <input type="radio" name="avatar" value="🦊">
+                        <span>🦊</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="join-button" onclick="joinRoom()">Join Room</button>
         </div>
-
-        <div>
-
-            <label for="isMaster">Scrum Master:</label>
-            <input
-                type="checkbox"
-                id="isMaster"
-            >
-        </div>
-
-        <div class="recommended-rooms-container">
-            <label>Recommended Rooms:</label>
-            <button class="room-chip" onclick="selectRoom('ECM-Gryffindor')">ECM-Gryffindor</button>
-            <button class="room-chip" onclick="selectRoom('ECM-Hufflepuff')">ECM-Hufflepuff</button>
-        </div>
-
-        <button
-            onclick="joinRoom()"
-            style="width: 100px;"
-        >Join Room</button>
     </div>
 
     <!-- What's New Button -->
@@ -503,92 +612,87 @@
                 <button class="close-modal" onclick="toggleWhatsNew()">&times;</button>
             </div>
             <ul class="whats-new-list">
-                <li>🟢 Real-time connection monitoring with status indicators</li>
-                <li>⏰ Session persistence with 6-hour grace period for auto-reconnection</li>
-                <li>☕ Request breaks or signal questions during estimation</li>
-                <li>🎯 Flexible voting: change or remove your vote anytime</li>
-                <li>👑 Enhanced Scrum Master controls for session management</li>
+                <li>🎨 <strong>Complete UI/UX Redesign:</strong> Modern, clean interface with smooth animations and premium button interactions</li>
+                <li>🌓 <strong>Enhanced Dark Mode:</strong> Elegant theme toggle with smooth transitions between light and dark modes</li>
+                <li>👤 <strong>Custom Avatars:</strong> Choose from 10 unique avatars that display throughout your session</li>
+                <li>⏰ <strong>6-Hour Session Persistence:</strong> Your session data is saved for 6 hours - close your browser and come back anytime</li>
+                <li>🔄 <strong>5-Minute Reconnection Grace:</strong> If you disconnect temporarily, you have 5 minutes to reconnect without losing your spot</li>
+                <li>🔙 <strong>Quick Return to Login:</strong> Click on your user info box in the lobby to instantly return to the login screen</li>
+                <li>☕ <strong>Break & Question Indicators:</strong> Subtle emoji badges appear on user avatars when requesting breaks or asking questions</li>
+                <li>🎯 <strong>Flexible Voting:</strong> Change or deselect your vote anytime before the Scrum Master reveals results</li>
+                <li>📊 <strong>Prominent Vote Display:</strong> When votes are revealed, they appear large and clear for easy consensus building</li>
+                <li>✨ <strong>Long Name Support:</strong> User names of any length display elegantly without truncation throughout the interface</li>
             </ul>
         </div>
     </div>
 
-    <div
-        id="connectionStatus"
-        class="status-connected d-none"
-    >
-        🟢 Connected
-    </div>
+    <!-- Game Section (Lobby Screen) -->
+    <div id="gameSection" class="game-section d-none">
+        <div class="container">
+            <div class="header-area">
+                <div class="user-info-section" onclick="returnToLogin()" title="Click to return to login screen">
+                    <div class="user-avatar-display" id="userAvatarDisplay">👤</div>
+                    <div class="user-details-display">
+                        <h2 id="userNameDisplay">User</h2>
+                        <p id="userRoomDisplay">Room: -</p>
+                    </div>
+                </div>
 
-    <div
-        id="countInfo"
-        class="d-none"
-    >
-        <div
-            id="userCount"
-            style="margin: 10px 0px;"
-        >Participants: 0</div>
-
-        <!-- <div style="margin: 10px 0px;">Average of Votes: <span id="averageVote">-</span></div> -->
-
-        <div style="margin: 10px 0px;">Voters: <span id="voters">0</span></div>
-    </div>
-
-    <hr>
-
-    <div
-        id="gameSection"
-        class="game-section d-none"
-    >
-        <div class="voting-controls">
-            <div class="vote-buttons-left">
-                <button class="vote-btn" onclick="toggleVote(event, 0)">0</button>
-                <button class="vote-btn" onclick="toggleVote(event, 1)">1</button>
-                <button class="vote-btn" onclick="toggleVote(event, 2)">2</button>
-                <button class="vote-btn" onclick="toggleVote(event, 3)">3</button>
-                <button class="vote-btn" onclick="toggleVote(event, 5)">5</button>
-                <button class="vote-btn" onclick="toggleVote(event, 8)">8</button>
-                <button class="vote-btn" onclick="toggleVote(event, 13)">13</button>
-                <button class="vote-btn" onclick="toggleVote(event, 21)">21</button>
-                <button class="vote-btn" onclick="toggleVote(event, 40)">40</button>
-                <span style="margin-left: 10px;">|</span>
-                <button class="vote-btn" onclick="toggleVote(event, 'coffee ☕')">coffee ☕</button>
+                <div class="page-title">
+                    <h1>Planning Poker</h1>
+                </div>
             </div>
-            <div class="request-buttons-right">
-                <button id="breakRequestBtn" class="request-btn break-btn" onclick="toggleBreakRequest()">
-                    ☕ Request Break
-                </button>
-                <button id="questionBtn" class="request-btn question-btn" onclick="toggleQuestion()">
-                    ❓ Ask Question
-                </button>
+
+            <div class="divider"></div>
+
+            <div class="voting-section">
+                <div class="voting-controls">
+                    <div class="vote-buttons">
+                        <button class="vote-btn" onclick="toggleVote(event, 0)">0</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 1)">1</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 2)">2</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 3)">3</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 5)">5</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 8)">8</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 13)">13</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 21)">21</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 40)">40</button>
+                        <button class="vote-btn" onclick="toggleVote(event, 'coffee ☕')">☕</button>
+                    </div>
+                    <div class="request-buttons">
+                        <button id="breakRequestBtn" class="request-btn" onclick="toggleBreakRequest()">
+                            ☕ Break
+                        </button>
+                        <button id="questionBtn" class="request-btn" onclick="toggleQuestion()">
+                            ❓ Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-master master-controls d-none">
+                <button
+                    id="revealBtn"
+                    class="master-btn"
+                    onclick="showVotes()"
+                    style="display: none;"
+                >Reveal Votes</button>
+
+                <button
+                    id="resetBtn"
+                    class="master-btn danger"
+                    onclick="resetVotes()"
+                    style="display: none;"
+                    disabled
+                >Restart</button>
+            </div>
+
+            <div id="userContainer">
+                <div class="users-grid" id="users"></div>
             </div>
         </div>
-        <hr>
-
-        <div class="section-master d-none">
-            <button
-                id="revealBtn"
-                onclick="showVotes()"
-                style="display: none;"
-            >Reveal Votes</button>
-
-            <button
-                id="resetBtn"
-                onclick="resetVotes()"
-                style="display: none;"
-                disabled
-            >Restart</button>
-        </div>
-
-
-
-        <div id="userContainer">
-            <div
-                class="users"
-                id="users"
-            ></div>
-        </div>
-
-
     </div>
 
 </body>
