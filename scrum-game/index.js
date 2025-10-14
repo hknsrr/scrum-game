@@ -31,10 +31,11 @@ io.on('connection', (socket) => {
         return number >= average - tolerance && number <= average + tolerance;
     }
 
-    socket.on('joinRoom', ({ room, name, isMaster }) => {
+    socket.on('joinRoom', ({ room, name, isMaster, avatar }) => {
 
         room = encodeHTML(room);
         name = encodeHTML(name);
+        avatar = encodeHTML(avatar || '👤');
 
         socket.join(room);
         if (!rooms[room]) rooms[room] = { master: null, users: {} };
@@ -66,7 +67,8 @@ io.on('connection', (socket) => {
             rooms[room].users[socket.id] = {
                 ...existingUserData,
                 isAway: false, // User is back, clear away status
-                isMaster: isMaster
+                isMaster: isMaster,
+                avatar: avatar // Update avatar on reconnection
             };
 
             console.log(`User ${name} reconnected to room ${room}`);
@@ -78,7 +80,8 @@ io.on('connection', (socket) => {
                 requestBreak: false,
                 hasQuestion: false,
                 isAway: false,
-                isMaster: isMaster
+                isMaster: isMaster,
+                avatar: avatar
             };
         }
 

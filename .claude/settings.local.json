@@ -18,7 +18,11 @@
       "Bash(git push:*)",
       "Bash(git merge:*)",
       "Bash(git branch:*)",
-      "Bash(git init:*)"
+      "Bash(git init:*)",
+      "Bash(git remote add:*)",
+      "Bash(git rm:*)",
+      "Bash(rm:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

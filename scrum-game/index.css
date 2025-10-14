@@ -423,19 +423,19 @@ body::before {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
-    border-radius: 25px;
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 700;
+    border-radius: 18px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
     cursor: pointer;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     z-index: 1000;
     transition: all 0.3s ease;
 }
 
 .whats-new-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
 }
 
 /* What's New Modal */
@@ -470,10 +470,12 @@ body::before {
     padding: 28px;
     max-width: 500px;
     width: 100%;
+    max-height: 80vh;
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
     position: relative;
     animation: slideUp 0.3s ease;
+    overflow-y: auto;
 }
 
 @keyframes slideUp {
@@ -943,6 +945,10 @@ hr, .divider {
 
 /* Responsive */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
     .voting-controls {
         flex-direction: column;
         align-items: stretch;
@@ -969,23 +975,122 @@ hr, .divider {
         align-items: flex-start;
     }
 
+    .join-section {
+        padding: 10px;
+    }
+
     .join-container {
-        padding: 24px;
+        padding: 20px;
         max-width: 100%;
+        margin: 0 auto;
     }
 
     .join-header h1 {
-        font-size: 24px;
+        font-size: 22px;
+    }
+
+    .join-header p {
+        font-size: 13px;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
     }
 
     .avatar-grid {
         grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
+        gap: 6px;
     }
 
     .avatar-option {
-        width: 48px;
-        height: 48px;
-        font-size: 24px;
+        width: 44px;
+        height: 44px;
+        font-size: 22px;
+    }
+
+    .theme-toggle-container {
+        top: 10px;
+        right: 10px;
+    }
+
+    .theme-toggle-switch {
+        width: 60px;
+        height: 32px;
+    }
+
+    .theme-toggle-slider {
+        width: 26px;
+        height: 26px;
+        font-size: 14px;
+    }
+
+    [data-theme="dark"] .theme-toggle-slider {
+        transform: translateX(28px);
+    }
+
+    .whats-new-button {
+        bottom: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+
+    .whats-new-modal {
+        padding: 10px;
+    }
+
+    .whats-new-modal-content {
+        padding: 20px;
+        max-height: 85vh;
+    }
+
+    .whats-new-title {
+        font-size: 20px;
+    }
+
+    .whats-new-list li {
+        font-size: 14px;
+        padding: 10px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .join-container {
+        padding: 16px;
+    }
+
+    .join-header h1 {
+        font-size: 20px;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+
+    .avatar-option {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .room-chips {
+        flex-direction: column;
+    }
+
+    .room-chip {
+        width: 100%;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .join-container {
+        max-width: 500px;
+    }
+}
+
+@media (min-height: 900px) {
+    .join-container {
+        padding: 36px;
     }
 }

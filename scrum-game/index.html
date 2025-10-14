@@ -221,7 +221,8 @@
                 socket.emit('joinRoom', {
                     room: currentRoom,
                     name: userName,
-                    isMaster: isMaster
+                    isMaster: isMaster,
+                    avatar: selectedAvatar
                 });
             }
         });
@@ -293,7 +294,7 @@
                 // Session bilgilerini kaydet
                 saveSession(room, name, isMaster);
 
-                socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster });
+                socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster, avatar: selectedAvatar });
 
                 if (isMaster) {
                     document.getElementsByClassName('section-master')[0].classList.remove('d-none');
@@ -335,7 +336,7 @@
                 const masterClass = user.isMaster ? 'is-master' : '';
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? 'Away 💻' : (user.vote !== null ? 'Voted' : 'Not voted'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
-                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const userAvatar = user.avatar || '👤';
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
                 <div class="user-card-avatar">${userAvatar}</div>
@@ -370,7 +371,7 @@
                 // Master always shows emoji
                 const voteDisplay = user.isMaster ? '🥺' : (user.isAway ? 'Away 💻' : (user.vote !== null && user.vote !== 'null' ? user.vote : '🥺'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
-                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const userAvatar = user.avatar || '👤';
                 const revealedClass = 'vote-revealed'; // Add special class for revealed votes
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
@@ -407,7 +408,7 @@
                 const masterClass = user.isMaster ? 'is-master' : '';
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? 'Away 💻' : 'Not voted');
                 const masterBadge = user.isMaster ? ' 👑' : '';
-                const userAvatar = user.name === userName ? selectedAvatar : '👤';
+                const userAvatar = user.avatar || '👤';
                 userList += `
             <div class="userCard ${user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
                 <div class="user-card-avatar">${userAvatar}</div>
@@ -657,7 +658,7 @@
                         <button class="vote-btn" onclick="toggleVote(event, 13)">13</button>
                         <button class="vote-btn" onclick="toggleVote(event, 21)">21</button>
                         <button class="vote-btn" onclick="toggleVote(event, 40)">40</button>
-                        <button class="vote-btn" onclick="toggleVote(event, 'coffee ☕')">☕</button>
+                        <button class="vote-btn" onclick="toggleVote(event, '☕')">☕</button>
                     </div>
                     <div class="request-buttons">
                         <button id="breakRequestBtn" class="request-btn" onclick="toggleBreakRequest()">
