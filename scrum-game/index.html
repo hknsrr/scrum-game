@@ -135,6 +135,21 @@
                         document.getElementById('username').value = session.name;
                         document.getElementById('room').value = session.room;
                         document.getElementById('isMaster').checked = session.isMaster;
+
+                        // Restore avatar selection
+                        if (session.avatar) {
+                            selectedAvatar = session.avatar;
+                            // Update UI to show selected avatar
+                            document.querySelectorAll('.avatar-option').forEach(opt => {
+                                opt.classList.remove('selected');
+                                const radio = opt.querySelector('input[type="radio"]');
+                                if (radio && radio.value === session.avatar) {
+                                    opt.classList.add('selected');
+                                    radio.checked = true;
+                                }
+                            });
+                        }
+
                         return session;
                     } else {
                         // Session süresi dolmuş, temizle
@@ -148,12 +163,13 @@
         }
 
         // Session bilgilerini kaydet
-        function saveSession(room, name, isMaster) {
+        function saveSession(room, name, isMaster, avatar) {
             try {
                 const sessionData = {
                     room: room,
                     name: name,
                     isMaster: isMaster,
+                    avatar: avatar,
                     timestamp: Date.now()
                 };
                 localStorage.setItem('scrumSession', JSON.stringify(sessionData));
@@ -292,7 +308,7 @@
                 userName = name;
 
                 // Session bilgilerini kaydet
-                saveSession(room, name, isMaster);
+                saveSession(room, name, isMaster, selectedAvatar);
 
                 socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster, avatar: selectedAvatar });
 
@@ -369,7 +385,18 @@
                 const awayClass = user.isAway ? 'is-away' : '';
                 const masterClass = user.isMaster ? 'is-master' : '';
                 // Master always shows emoji
-                const voteDisplay = user.isMaster ? '🥺' : (user.isAway ? 'Away 💻' : (user.vote !== null && user.vote !== 'null' ? user.vote : '🥺'));
+                let voteDisplay;
+                if (user.isMaster) {
+                    voteDisplay = '🥺';
+                } else if (user.isAway) {
+                    voteDisplay = 'Away 💻';
+                } else if (user.vote === '☕') {
+                    voteDisplay = 'Coffee ☕';
+                } else if (user.vote !== null && user.vote !== 'null') {
+                    voteDisplay = user.vote;
+                } else {
+                    voteDisplay = '🥺';
+                }
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
                 const revealedClass = 'vote-revealed'; // Add special class for revealed votes
