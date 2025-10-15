@@ -119,31 +119,61 @@ io.on('connection', (socket) => {
 
             const users = rooms[room].users;
             let totalVotes = 0;
+            let validVotes = []; // Numeric votes only (excluding coffee, away, null)
 
+            // Collect valid numeric votes
             for (const userId in users) {
                 if (users.hasOwnProperty(userId)) {
-                    if (!isNaN(users[userId].vote) && users[userId].vote) {
-                        totalVotes ++;
+                    const vote = users[userId].vote;
+                    const isAway = users[userId].isAway;
+                    // Check if vote is numeric, not away, not coffee
+                    if (!isNaN(vote) && vote !== null && vote !== '' && !isAway && vote !== '☕') {
+                        const numericVote = Number(vote);
+                        validVotes.push(numericVote);
+                        totalVotes++;
                     }
                 }
             }
 
-            for (const userId in users) {
-                if (users.hasOwnProperty(userId)) {
+            // Calculate statistics
+            let average = 0;
+            let mostCommon = 0;
+            let consensus = 0;
 
-                    const tolerance = 0.75;
-                    const newNumber = users[userId].vote;
+            if (validVotes.length > 0) {
+                // Calculate average
+                const sum = validVotes.reduce((a, b) => a + b, 0);
+                average = (sum / validVotes.length).toFixed(1);
 
-                    if (isWithinRange(newNumber, tolerance)) {
-                        users[userId].isWinner = true;
-                    } else {
-                        users[userId].isWinner = false;
-                    }
+                // Calculate most common vote (mode)
+                const voteCounts = {};
+                validVotes.forEach(vote => {
+                    voteCounts[vote] = (voteCounts[vote] || 0) + 1;
+                });
 
+                // Find the most common vote(s)
+                const maxCount = Math.max(...Object.values(voteCounts));
+                const mostCommonVotes = Object.keys(voteCounts).filter(vote => voteCounts[vote] === maxCount);
+
+                // If there's a tie, show all tied values
+                if (mostCommonVotes.length === 1) {
+                    mostCommon = mostCommonVotes[0];
+                } else {
+                    mostCommon = mostCommonVotes.join(', ');
                 }
+
+                // Calculate consensus (percentage of most common vote)
+                consensus = Math.round((maxCount / validVotes.length) * 100);
             }
 
-            io.to(room).emit('updateVotes', rooms[room].users, totalVotes);
+            // Send statistics to client
+            const statistics = {
+                average: average || '-',
+                median: mostCommon || '-',
+                consensus: validVotes.length > 0 ? `${consensus}%` : '-'
+            };
+
+            io.to(room).emit('updateVotes', rooms[room].users, totalVotes, statistics);
         }
     });
 

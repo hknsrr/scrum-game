@@ -946,6 +946,50 @@ hr, .divider {
     margin-top: auto !important;
 }
 
+/* Statistics Section */
+.statistics-section {
+    display: flex;
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, var(--card-user-bg) 0%, rgba(102, 126, 234, 0.05) 100%);
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 140px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--button-primary);
+}
+
+.stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--button-primary);
+    line-height: 1;
+}
+
 /* Utility Classes */
 .d-none {
     display: none !important;
