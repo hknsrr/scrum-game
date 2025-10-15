@@ -289,6 +289,14 @@
             document.getElementById('joinSection').style.display = 'flex';
             document.getElementById('whatsNewButton').style.display = 'block';
 
+            // Hide master controls
+            document.getElementsByClassName('section-master')[0].classList.add('d-none');
+            document.getElementById('revealBtn').style.display = 'none';
+            document.getElementById('resetBtn').style.display = 'none';
+
+            // Hide statistics
+            document.getElementById('statisticsSection').style.display = 'none';
+
             // Disconnect from current room
             if (currentRoom) {
                 socket.disconnect();
@@ -296,6 +304,7 @@
             }
 
             currentRoom = null;
+            isMaster = false;
         }
 
         function joinRoom() {
@@ -312,10 +321,15 @@
 
                 socket.emit('joinRoom', { room: currentRoom, name: name, isMaster: isMaster, avatar: selectedAvatar });
 
+                // Always hide/show master controls based on current role
                 if (isMaster) {
                     document.getElementsByClassName('section-master')[0].classList.remove('d-none');
                     document.getElementById('revealBtn').style.display = 'block';
                     document.getElementById('resetBtn').style.display = 'block';
+                } else {
+                    document.getElementsByClassName('section-master')[0].classList.add('d-none');
+                    document.getElementById('revealBtn').style.display = 'none';
+                    document.getElementById('resetBtn').style.display = 'none';
                 }
 
                 // Update user info display
@@ -350,7 +364,7 @@
                 const questionClass = user.hasQuestion ? 'has-question' : '';
                 const awayClass = user.isAway ? 'is-away' : '';
                 const masterClass = user.isMaster ? 'is-master' : '';
-                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? 'Away 💻' : (user.vote !== null ? 'Voted' : 'Not voted'));
+                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : (user.vote !== null ? 'Voted' : 'Not voted'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
                 userList += `
@@ -363,12 +377,12 @@
             });
 
             document.getElementById("users").innerHTML = userList;
-            document.getElementById("userCount").innerText = `Participants: ${userCount}`;
+            // userCount display removed - not in HTML
         });
 
 
 
-        socket.on('updateVotes', function (users, voters) {
+        socket.on('updateVotes', function (users, voters, statistics) {
 
             let userList = '';
 
@@ -389,9 +403,9 @@
                 if (user.isMaster) {
                     voteDisplay = '🥺';
                 } else if (user.isAway) {
-                    voteDisplay = 'Away 💻';
+                    voteDisplay = '💤';
                 } else if (user.vote === '☕') {
-                    voteDisplay = 'Coffee ☕';
+                    voteDisplay = '☕';
                 } else if (user.vote !== null && user.vote !== 'null') {
                     voteDisplay = user.vote;
                 } else {
@@ -403,15 +417,22 @@
                 userList += `
             <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
                 <div class="user-card-avatar">${userAvatar}</div>
-                <h3>${user.name}${masterBadge} ${user.isWinner ? '🏆' : ''}</h3>
+                <h3>${user.name}${masterBadge}</h3>
                 <p class="${revealedClass}">${voteDisplay}</p>
             </div>
         `;
             });
 
             document.getElementById("users").innerHTML = userList;
-            // document.getElementById("averageVote").innerText = averageVote;
-            document.getElementById("voters").innerText = voters;
+            // voters display removed - not needed
+
+            // Show statistics section and update values
+            if (statistics) {
+                document.getElementById('statisticsSection').style.display = 'flex';
+                document.getElementById('averageValue').textContent = statistics.average;
+                document.getElementById('mostCommonValue').textContent = statistics.median;
+                document.getElementById('consensusValue').textContent = statistics.consensus;
+            }
         });
 
         socket.on('pulseDetected', function () {
@@ -433,7 +454,7 @@
                 const questionClass = user.hasQuestion ? 'has-question' : '';
                 const awayClass = user.isAway ? 'is-away' : '';
                 const masterClass = user.isMaster ? 'is-master' : '';
-                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? 'Away 💻' : 'Not voted');
+                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : 'Not voted');
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
                 userList += `
@@ -446,11 +467,17 @@
             });
 
             document.getElementById("users").innerHTML = userList;
-            // document.getElementById("averageVote").innerText = '-';
-            document.getElementById("voters").innerText = '0';
-            // document.getElementById('revealBtn').setAttribute('disabled', true);
+            // voters display removed - not needed
 
-            document.getElementById('resetBtn').setAttribute('disabled', true); // Butonu aktif hale getir
+            // Re-enable reveal button and disable reset button
+            document.getElementById('revealBtn').removeAttribute('disabled');
+            document.getElementById('resetBtn').setAttribute('disabled', true);
+
+            // Hide statistics section
+            document.getElementById('statisticsSection').style.display = 'none';
+            document.getElementById('averageValue').textContent = '-';
+            document.getElementById('mostCommonValue').textContent = '-';
+            document.getElementById('consensusValue').textContent = '-';
 
             let voteButtons = document.querySelectorAll('.vote-btn');
             voteButtons.forEach(button => {
@@ -550,8 +577,7 @@
     <div class="join-section" id="joinSection">
         <div class="join-container">
             <div class="join-header">
-                <h1>Planning Poker</h1>
-                <p>Join a room to start planning</p>
+                <h1>Scrum Poker</h1>
             </div>
 
             <div class="form-group">
@@ -667,7 +693,7 @@
                 </div>
 
                 <div class="page-title">
-                    <h1>Planning Poker</h1>
+                    <h1>Scrum Poker</h1>
                 </div>
             </div>
 
@@ -689,11 +715,27 @@
                     </div>
                     <div class="request-buttons">
                         <button id="breakRequestBtn" class="request-btn" onclick="toggleBreakRequest()">
-                            ☕ Break
+                            ☕ Request Break
                         </button>
                         <button id="questionBtn" class="request-btn" onclick="toggleQuestion()">
                             ❓ Question
                         </button>
+                    </div>
+                </div>
+
+                <!-- Statistics Section (shown only when votes are revealed) -->
+                <div id="statisticsSection" class="statistics-section" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-label">📊 Average</div>
+                        <div class="stat-value" id="averageValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">🎯 Most Common</div>
+                        <div class="stat-value" id="mostCommonValue">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">🤝 Consensus</div>
+                        <div class="stat-value" id="consensusValue">-</div>
                     </div>
                 </div>
             </div>
