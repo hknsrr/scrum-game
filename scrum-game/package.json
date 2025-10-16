@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
+    "build": "echo 'No build step required for this Node.js server'",
     "start": "node index.js"
   },
   "dependencies": {

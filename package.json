@@ -1,0 +1,11 @@
+{
+  "name": "scrum-poker-workspace",
+  "version": "1.0.0",
+  "description": "Scrum Poker workspace",
+  "scripts": {
+    "build": "cd scrum-game && npm install",
+    "start": "cd scrum-game && npm start",
+    "dev": "cd scrum-game && npm run dev"
+  },
+  "private": true
+}
