@@ -938,6 +938,107 @@ hr, .divider {
     }
 }
 
+/* MSN Messenger-style Vibration Animation */
+@keyframes vibrate {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    10% { transform: translate(-8px, -6px) rotate(-2deg); }
+    20% { transform: translate(8px, 6px) rotate(2deg); }
+    30% { transform: translate(-8px, 6px) rotate(-2deg); }
+    40% { transform: translate(8px, -6px) rotate(2deg); }
+    50% { transform: translate(-8px, -6px) rotate(-2deg); }
+    60% { transform: translate(8px, 6px) rotate(2deg); }
+    70% { transform: translate(-8px, 6px) rotate(-2deg); }
+    80% { transform: translate(8px, -6px) rotate(2deg); }
+    90% { transform: translate(-8px, -6px) rotate(-2deg); }
+}
+
+.userCard.vibrating {
+    animation: vibrate 0.5s ease-in-out;
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.6) !important;
+}
+
+/* Vibration Button - Premium Design */
+.vibrate-btn {
+    position: absolute;
+    bottom: -14px;
+    right: -14px;
+    background: linear-gradient(145deg, #ffffff, #f0f0f0);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .vibrate-btn {
+    background: linear-gradient(145deg, #374151, #2d3748);
+    border-color: #4a5568;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.userCard:hover .vibrate-btn {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.vibrate-btn:hover {
+    transform: scale(1.2);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4),
+                inset 0 -3px 6px rgba(102, 126, 234, 0.1);
+    border-color: var(--button-primary);
+    background: linear-gradient(145deg, #667eea, #5568d3);
+    color: white;
+}
+
+.vibrate-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3),
+                inset 0 3px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Success state when vibration is sent */
+.vibrate-btn.sending {
+    animation: vibrate-send 0.6s ease-out;
+    background: linear-gradient(145deg, #48bb78, #38a169);
+    border-color: #48bb78;
+    color: white;
+    pointer-events: none;
+}
+
+@keyframes vibrate-send {
+    0% {
+        transform: scale(1);
+    }
+    20% {
+        transform: scale(1.25) rotate(10deg);
+    }
+    40% {
+        transform: scale(1.15) rotate(-10deg);
+    }
+    60% {
+        transform: scale(1.2) rotate(5deg);
+    }
+    80% {
+        transform: scale(1.1) rotate(-5deg);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 /* Revealed Vote Styling - Clean and Classy */
 .vote-revealed {
     font-size: 32px !important;
@@ -1104,6 +1205,15 @@ hr, .divider {
         font-size: 14px;
         padding: 10px 0;
     }
+
+    /* Smaller vibrate button on mobile */
+    .vibrate-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+        bottom: -12px;
+        right: -12px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1132,6 +1242,15 @@ hr, .divider {
 
     .room-chip {
         width: 100%;
+    }
+
+    /* Even smaller on very small screens */
+    .vibrate-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+        bottom: -10px;
+        right: -10px;
     }
 }
 

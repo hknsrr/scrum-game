@@ -81,6 +81,7 @@
         let isMaster = false;
         let userName = '';
         let selectedAvatar = '👤'; // Default avatar
+        let votesRevealed = false; // Track if votes are currently revealed
         const SESSION_DURATION = 6 * 60 * 60 * 1000; // 6 saat
 
         // Theme toggle functionality
@@ -295,6 +296,7 @@
             document.getElementById('resetBtn').style.display = 'none';
 
             // Hide statistics
+            votesRevealed = false; // Reset voting state
             document.getElementById('statisticsSection').style.display = 'none';
 
             // Disconnect from current room
@@ -364,20 +366,55 @@
                 const questionClass = user.hasQuestion ? 'has-question' : '';
                 const awayClass = user.isAway ? 'is-away' : '';
                 const masterClass = user.isMaster ? 'is-master' : '';
-                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : (user.vote !== null ? 'Voted' : 'Not voted'));
+
+                // Determine vote display based on whether votes are revealed
+                let voteDisplay;
+                let revealedClass = '';
+
+                if (votesRevealed) {
+                    // If votes are revealed, show actual values
+                    revealedClass = 'vote-revealed';
+                    if (user.isMaster) {
+                        voteDisplay = '🥺';
+                    } else if (user.isAway) {
+                        voteDisplay = '💤';
+                    } else if (user.vote === '☕') {
+                        voteDisplay = '☕';
+                    } else if (user.vote !== null && user.vote !== 'null') {
+                        voteDisplay = user.vote;
+                    } else {
+                        voteDisplay = '🥺';
+                    }
+                } else {
+                    // If votes not revealed, show status text
+                    voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : (user.vote !== null ? 'Voted' : 'Not voted'));
+                }
+
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
+
+                // Add vibrate button only for Scrum Master and not for themselves
+                const vibrateButton = (isMaster && !user.isMaster)
+                    ? `<button class="vibrate-btn" onclick="sendVibration('${user.socketId}', event)" title="Notify user">🔔</button>`
+                    : '';
+
                 userList += `
-            <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
+            <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}" data-socket-id="${user.socketId}">
+                ${vibrateButton}
                 <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge}</h3>
-                <p>${voteDisplay}</p>
+                <p class="${revealedClass}">${voteDisplay}</p>
             </div>
         `;
             });
 
             document.getElementById("users").innerHTML = userList;
             // userCount display removed - not in HTML
+
+            // Only hide statistics if votes haven't been revealed yet
+            if (!votesRevealed) {
+                document.getElementById('statisticsSection').style.display = 'none';
+            }
         });
 
 
@@ -414,8 +451,15 @@
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
                 const revealedClass = 'vote-revealed'; // Add special class for revealed votes
+
+                // Add vibrate button only for Scrum Master and not for themselves
+                const vibrateButton = (isMaster && !user.isMaster)
+                    ? `<button class="vibrate-btn" onclick="sendVibration('${user.socketId}', event)" title="Notify user">🔔</button>`
+                    : '';
+
                 userList += `
-            <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
+            <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}" data-socket-id="${user.socketId}">
+                ${vibrateButton}
                 <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge}</h3>
                 <p class="${revealedClass}">${voteDisplay}</p>
@@ -428,6 +472,7 @@
 
             // Show statistics section and update values
             if (statistics) {
+                votesRevealed = true; // Mark votes as revealed
                 document.getElementById('statisticsSection').style.display = 'flex';
                 document.getElementById('averageValue').textContent = statistics.average;
                 document.getElementById('mostCommonValue').textContent = statistics.median;
@@ -457,8 +502,15 @@
                 const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : 'Not voted');
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
+
+                // Add vibrate button only for Scrum Master and not for themselves
+                const vibrateButton = (isMaster && !user.isMaster)
+                    ? `<button class="vibrate-btn" onclick="sendVibration('${user.socketId}', event)" title="Notify user">🔔</button>`
+                    : '';
+
                 userList += `
-            <div class="userCard ${user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}">
+            <div class="userCard ${user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}" data-socket-id="${user.socketId}">
+                ${vibrateButton}
                 <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge}</h3>
                 <p>${voteDisplay}</p>
@@ -474,6 +526,7 @@
             document.getElementById('resetBtn').setAttribute('disabled', true);
 
             // Hide statistics section
+            votesRevealed = false; // Reset voting state
             document.getElementById('statisticsSection').style.display = 'none';
             document.getElementById('averageValue').textContent = '-';
             document.getElementById('mostCommonValue').textContent = '-';
@@ -496,6 +549,10 @@
             voteButtons.forEach(button => {
                 button.classList.remove('active');
             });
+
+            // Reset revealed state when voting changes
+            votesRevealed = false;
+            document.getElementById('statisticsSection').style.display = 'none';
 
             if (isActive) {
                 // Deselect - send null vote
@@ -552,6 +609,63 @@
                 socket.emit('question', { room: currentRoom, hasQuestion: true });
             }
         }
+
+        // Send vibration to specific user with button feedback
+        function sendVibration(targetSocketId, event) {
+            const button = event.currentTarget;
+
+            // Add sending state
+            button.classList.add('sending');
+            button.textContent = '✨';
+
+            // Vibrate the target user's card on Scrum Master's screen
+            const targetCard = document.querySelector(`.userCard[data-socket-id="${targetSocketId}"]`);
+            if (targetCard) {
+                targetCard.classList.add('vibrating');
+                setTimeout(() => {
+                    targetCard.classList.remove('vibrating');
+                }, 500);
+            }
+
+            // Play sound for Scrum Master too
+            playNotificationSound();
+
+            // Send vibration
+            socket.emit('sendVibration', { room: currentRoom, targetSocketId: targetSocketId });
+
+            // Reset button after animation
+            setTimeout(() => {
+                button.classList.remove('sending');
+                button.textContent = '🔔';
+            }, 600);
+        }
+
+        // Play MSN Messenger nudge sound
+        function playNotificationSound() {
+            const audio = new Audio('nudge.mp3');
+            audio.volume = 0.7;
+            audio.play().catch(error => {
+                console.log('Audio playback failed:', error);
+            });
+        }
+
+        // Receive vibration
+        socket.on('receiveVibration', function(data) {
+            const userCard = document.querySelector(`.userCard[data-socket-id="${socket.id}"]`);
+            if (userCard) {
+                userCard.classList.add('vibrating');
+
+                // Play MSN-style notification sound
+                playNotificationSound();
+
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                    userCard.classList.remove('vibrating');
+                }, 500);
+
+                console.log(`Vibration received from Scrum Master!`);
+            }
+        });
 
 
         // Manuel pulse mekanizması kaldırıldı
@@ -674,8 +788,11 @@
                 <li>🔙 <strong>Quick Return to Login:</strong> Click on your user info box in the lobby to instantly return to the login screen</li>
                 <li>☕ <strong>Break & Question Indicators:</strong> Subtle emoji badges appear on user avatars when requesting breaks or asking questions</li>
                 <li>🎯 <strong>Flexible Voting:</strong> Change or deselect your vote anytime before the Scrum Master reveals results</li>
-                <li>📊 <strong>Prominent Vote Display:</strong> When votes are revealed, they appear large and clear for easy consensus building</li>
-                <li>✨ <strong>Long Name Support:</strong> User names of any length display elegantly without truncation throughout the interface</li>
+                <li>📊 <strong>Voting Statistics:</strong> Automatic calculation of Average, Most Common, and Consensus percentage when votes are revealed (excludes Scrum Master votes)</li>
+                <li>🔔 <strong>MSN Messenger-Style Notifications:</strong> Scrum Masters can send instant vibration alerts to team members with sound effects and visual feedback</li>
+                <li>✨ <strong>Premium Button Interactions:</strong> Satisfying haptic-like feedback animations with color transitions and state changes</li>
+                <li>📈 <strong>Prominent Vote Display:</strong> When votes are revealed, they appear large and clear for easy consensus building</li>
+                <li>🎪 <strong>Long Name Support:</strong> User names of any length display elegantly without truncation throughout the interface</li>
             </ul>
         </div>
     </div>
