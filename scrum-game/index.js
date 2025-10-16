@@ -66,6 +66,7 @@ io.on('connection', (socket) => {
             // Restore state with new socket ID
             rooms[room].users[socket.id] = {
                 ...existingUserData,
+                socketId: socket.id, // Add socket ID
                 isAway: false, // User is back, clear away status
                 isMaster: isMaster,
                 avatar: avatar // Update avatar on reconnection
@@ -81,7 +82,8 @@ io.on('connection', (socket) => {
                 hasQuestion: false,
                 isAway: false,
                 isMaster: isMaster,
-                avatar: avatar
+                avatar: avatar,
+                socketId: socket.id // Add socket ID
             };
         }
 
@@ -121,13 +123,15 @@ io.on('connection', (socket) => {
             let totalVotes = 0;
             let validVotes = []; // Numeric votes only (excluding coffee, away, null)
 
-            // Collect valid numeric votes
+            // Collect valid numeric votes (exclude Scrum Master)
             for (const userId in users) {
                 if (users.hasOwnProperty(userId)) {
-                    const vote = users[userId].vote;
-                    const isAway = users[userId].isAway;
-                    // Check if vote is numeric, not away, not coffee
-                    if (!isNaN(vote) && vote !== null && vote !== '' && !isAway && vote !== '☕') {
+                    const user = users[userId];
+                    const vote = user.vote;
+                    const isAway = user.isAway;
+                    const isMaster = user.isMaster;
+                    // Check if vote is numeric, not away, not coffee, and not from Scrum Master
+                    if (!isNaN(vote) && vote !== null && vote !== '' && !isAway && vote !== '☕' && !isMaster) {
                         const numericVote = Number(vote);
                         validVotes.push(numericVote);
                         totalVotes++;
@@ -262,6 +266,24 @@ io.on('connection', (socket) => {
         if (rooms[room] && rooms[room].users[socket.id]) {
             rooms[room].users[socket.id].isAway = isAway;
             io.to(room).emit('updateUsers', rooms[room].users);
+        }
+    });
+
+    socket.on('sendVibration', ({ room, targetSocketId }) => {
+
+        room = encodeHTML(room);
+        targetSocketId = encodeHTML(targetSocketId);
+
+        // Check if sender is Scrum Master
+        if (rooms[room] && rooms[room].master === socket.id) {
+            // Send vibration to specific user
+            io.to(targetSocketId).emit('receiveVibration', {
+                from: socket.id,
+                room: room
+            });
+            console.log(`Scrum Master sent vibration to ${targetSocketId} in room ${room}`);
+        } else {
+            console.log(`Unauthorized vibration attempt by ${socket.id} in room ${room}`);
         }
     });
 
