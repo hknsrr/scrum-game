@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: scrum-poker
+    env: node
+    rootDir: scrum-game
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
