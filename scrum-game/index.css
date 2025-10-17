@@ -55,6 +55,9 @@
                 color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
                 border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
                 box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Better touch experience on mobile */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
 }
 
 body {
@@ -64,6 +67,29 @@ body {
     min-height: 100vh;
     padding: 20px;
     position: relative;
+    /* Prevent text selection on mobile for better UX */
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Allow text selection for input fields and text content */
+input, textarea, .userCard h3, .user-details-display {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+/* Optimize buttons and interactive elements for touch */
+button, .vote-btn, .request-btn, .master-btn, .join-button,
+.room-chip, .avatar-option, .theme-toggle-switch, .userCard {
+    touch-action: manipulation;
+    cursor: pointer;
+    /* Ensure minimum touch target size of 44x44px for accessibility */
+}
+
+/* Smooth scrolling for better mobile experience */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Subtle gradient background */
@@ -1099,24 +1125,61 @@ hr, .divider {
 /* Responsive */
 @media (max-width: 768px) {
     body {
-        padding: 10px;
+        padding: 8px;
+    }
+
+    .voting-section {
+        padding: 16px;
     }
 
     .voting-controls {
         flex-direction: column;
         align-items: stretch;
+        gap: 12px;
+    }
+
+    .vote-buttons {
+        justify-content: center;
+    }
+
+    .vote-btn {
+        min-width: 48px;
+        padding: 10px 16px;
+        font-size: 14px;
     }
 
     .request-buttons-right, .request-buttons {
         justify-content: stretch;
+        gap: 8px;
     }
 
     .request-btn {
         flex: 1;
+        padding: 10px 16px;
+        font-size: 12px;
     }
 
     .users, .users-grid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 12px;
+    }
+
+    .userCard {
+        padding: 16px 12px;
+        min-height: 160px;
+    }
+
+    .user-card-avatar {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
+
+    .userCard h3 {
+        font-size: 13px;
+    }
+
+    .userCard p {
+        font-size: 12px;
     }
 
     .page-title h1 {
@@ -1125,7 +1188,52 @@ hr, .divider {
 
     .header-area {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        min-height: auto;
+    }
+
+    .header-area .page-title {
+        position: static;
+        transform: none;
+        pointer-events: auto;
+        order: -1;
+        margin-bottom: 8px;
+    }
+
+    .user-info-section {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .section-master, .master-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .master-btn, #revealBtn, #resetBtn {
+        width: 100%;
+        padding: 12px 24px;
+        font-size: 13px;
+    }
+
+    .statistics-section {
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .stat-card {
+        min-width: 120px;
+        padding: 14px 20px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-value {
+        font-size: 24px;
     }
 
     .join-section {
@@ -1133,13 +1241,17 @@ hr, .divider {
     }
 
     .join-container {
-        padding: 20px;
+        padding: 24px 20px;
         max-width: 100%;
         margin: 0 auto;
     }
 
+    .join-header {
+        margin-bottom: 24px;
+    }
+
     .join-header h1 {
-        font-size: 22px;
+        font-size: 24px;
     }
 
     .join-header p {
@@ -1150,15 +1262,37 @@ hr, .divider {
         margin-bottom: 16px;
     }
 
+    .form-group input[type="text"] {
+        padding: 11px 13px;
+        font-size: 14px;
+    }
+
+    .checkbox-group {
+        padding: 10px;
+    }
+
+    .checkbox-group label {
+        font-size: 13px;
+    }
+
+    .avatar-section {
+        margin-bottom: 20px;
+    }
+
     .avatar-grid {
         grid-template-columns: repeat(5, 1fr);
-        gap: 6px;
+        gap: 8px;
     }
 
     .avatar-option {
-        width: 44px;
-        height: 44px;
-        font-size: 22px;
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
+    }
+
+    .join-button {
+        padding: 13px;
+        font-size: 14px;
     }
 
     .theme-toggle-container {
@@ -1184,7 +1318,7 @@ hr, .divider {
     .whats-new-button {
         bottom: 10px;
         right: 10px;
-        padding: 6px 12px;
+        padding: 7px 12px;
         font-size: 11px;
     }
 
@@ -1206,7 +1340,6 @@ hr, .divider {
         padding: 10px 0;
     }
 
-    /* Smaller vibrate button on mobile */
     .vibrate-btn {
         width: 30px;
         height: 30px;
@@ -1217,40 +1350,470 @@ hr, .divider {
 }
 
 @media (max-width: 480px) {
+    body {
+        padding: 6px;
+    }
+
     .join-container {
-        padding: 16px;
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    .join-header {
+        margin-bottom: 20px;
     }
 
     .join-header h1 {
-        font-size: 20px;
+        font-size: 22px;
     }
 
-    .avatar-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 6px;
+    .form-group {
+        margin-bottom: 14px;
     }
 
-    .avatar-option {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    .form-group label {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .form-group input[type="text"] {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+
+    .checkbox-group {
+        padding: 9px;
+        margin-bottom: 16px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+    }
+
+    .checkbox-group label {
+        font-size: 13px;
+    }
+
+    .recommended-rooms-container {
+        margin-bottom: 16px;
+    }
+
+    .recommended-rooms-container label {
+        font-size: 12px;
     }
 
     .room-chips {
         flex-direction: column;
+        gap: 6px;
     }
 
     .room-chip {
         width: 100%;
+        padding: 10px 14px;
+        font-size: 13px;
     }
 
-    /* Even smaller on very small screens */
+    .avatar-section {
+        margin-bottom: 18px;
+    }
+
+    .avatar-section-label {
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+    }
+
+    .avatar-option {
+        width: 42px;
+        height: 42px;
+        font-size: 22px;
+        border-width: 2px;
+    }
+
+    .avatar-option.selected {
+        border-width: 2px;
+    }
+
+    .join-button {
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .theme-toggle-switch {
+        width: 56px;
+        height: 30px;
+    }
+
+    .theme-toggle-slider {
+        width: 24px;
+        height: 24px;
+        font-size: 13px;
+    }
+
+    [data-theme="dark"] .theme-toggle-slider {
+        transform: translateX(26px);
+    }
+
+    /* Lobby screen mobile improvements */
+    .users, .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+    }
+
+    .userCard {
+        padding: 14px 10px;
+        min-height: 150px;
+        border-radius: 14px;
+    }
+
+    .user-card-avatar {
+        font-size: 44px;
+        margin-bottom: 8px;
+    }
+
+    .userCard h3 {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .userCard p {
+        font-size: 11px;
+    }
+
+    .vote-btn {
+        min-width: 44px;
+        padding: 9px 14px;
+        font-size: 13px;
+    }
+
+    .request-btn {
+        padding: 9px 14px;
+        font-size: 11px;
+    }
+
+    .statistics-section {
+        gap: 10px;
+    }
+
+    .stat-card {
+        min-width: 110px;
+        padding: 12px 16px;
+        border-radius: 10px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    .page-title h1 {
+        font-size: 22px;
+    }
+
+    .user-info-section {
+        padding: 10px 14px;
+        border-radius: 14px;
+    }
+
+    .user-avatar-display {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+    }
+
+    .user-details-display h2 {
+        font-size: 14px;
+    }
+
+    .user-details-display p {
+        font-size: 11px;
+    }
+
+    .master-btn, #revealBtn, #resetBtn {
+        padding: 11px 20px;
+        font-size: 12px;
+    }
+
     .vibrate-btn {
         width: 28px;
         height: 28px;
         font-size: 13px;
         bottom: -10px;
         right: -10px;
+    }
+
+    .voting-section {
+        padding: 14px;
+        border-radius: 14px;
+    }
+}
+
+/* Extra small screens - very small mobile devices */
+@media (max-width: 360px) {
+    body {
+        padding: 4px;
+    }
+
+    .join-container {
+        padding: 16px 12px;
+        border-radius: 14px;
+    }
+
+    .join-header h1 {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .form-group label {
+        font-size: 11px;
+        margin-bottom: 5px;
+    }
+
+    .form-group input[type="text"] {
+        padding: 9px 11px;
+        font-size: 13px;
+        border-radius: 8px;
+    }
+
+    .checkbox-group {
+        padding: 8px;
+        margin-bottom: 14px;
+        border-radius: 8px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+
+    .checkbox-group label {
+        font-size: 12px;
+    }
+
+    .recommended-rooms-container {
+        margin-bottom: 14px;
+    }
+
+    .recommended-rooms-container label {
+        font-size: 11px;
+    }
+
+    .room-chip {
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 16px;
+    }
+
+    .avatar-section {
+        margin-bottom: 16px;
+    }
+
+    .avatar-section-label {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+    }
+
+    .avatar-option {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
+        border-width: 2px;
+    }
+
+    .join-button {
+        padding: 11px;
+        font-size: 12px;
+        border-radius: 10px;
+    }
+
+    .theme-toggle-switch {
+        width: 52px;
+        height: 28px;
+    }
+
+    .theme-toggle-slider {
+        width: 22px;
+        height: 22px;
+        font-size: 12px;
+        top: 3px;
+        left: 3px;
+    }
+
+    [data-theme="dark"] .theme-toggle-slider {
+        transform: translateX(24px);
+    }
+
+    .whats-new-button {
+        padding: 6px 10px;
+        font-size: 10px;
+        border-radius: 14px;
+    }
+
+    .whats-new-modal-content {
+        padding: 16px;
+        border-radius: 12px;
+    }
+
+    .whats-new-title {
+        font-size: 18px;
+    }
+
+    .whats-new-list li {
+        font-size: 13px;
+        padding: 8px 0;
+    }
+
+    /* Lobby screen for very small devices */
+    .page-title h1 {
+        font-size: 20px;
+    }
+
+    .header-area {
+        gap: 10px;
+    }
+
+    .user-info-section {
+        padding: 9px 12px;
+        gap: 10px;
+        border-radius: 12px;
+    }
+
+    .user-avatar-display {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .user-details-display h2 {
+        font-size: 13px;
+    }
+
+    .user-details-display p {
+        font-size: 10px;
+    }
+
+    .voting-section {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .vote-buttons {
+        gap: 6px;
+    }
+
+    .vote-btn {
+        min-width: 40px;
+        padding: 8px 12px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+
+    .request-buttons {
+        gap: 6px;
+    }
+
+    .request-btn {
+        padding: 8px 12px;
+        font-size: 10px;
+        border-radius: 8px;
+    }
+
+    .statistics-section {
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .stat-card {
+        min-width: 100px;
+        padding: 10px 14px;
+        border-radius: 8px;
+    }
+
+    .stat-label {
+        font-size: 9px;
+        margin-bottom: 5px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .section-master, .master-controls {
+        gap: 8px;
+    }
+
+    .master-btn, #revealBtn, #resetBtn {
+        padding: 10px 18px;
+        font-size: 11px;
+        border-radius: 8px;
+    }
+
+    .users, .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+
+    .userCard {
+        padding: 12px 8px;
+        min-height: 140px;
+        border-radius: 12px;
+        border-width: 2px;
+    }
+
+    .user-card-avatar {
+        font-size: 40px;
+        margin-bottom: 6px;
+    }
+
+    .userCard h3 {
+        font-size: 11px;
+        margin-bottom: 5px;
+    }
+
+    .userCard p {
+        font-size: 10px;
+    }
+
+    .vote-revealed {
+        font-size: 28px !important;
+    }
+
+    .vibrate-btn {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+        bottom: -9px;
+        right: -9px;
+    }
+
+    .userCard.has-break-request .user-card-avatar::before,
+    .userCard.has-question .user-card-avatar::after {
+        width: 32px;
+        height: 32px;
+        font-size: 20px;
+    }
+
+    hr, .divider {
+        margin: 16px 0;
     }
 }
 
@@ -1263,5 +1826,159 @@ hr, .divider {
 @media (min-height: 900px) {
     .join-container {
         padding: 36px;
+    }
+}
+
+/* Landscape orientation optimizations for mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .join-section {
+        padding: 8px;
+    }
+
+    .join-container {
+        padding: 16px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    .join-header {
+        margin-bottom: 16px;
+    }
+
+    .join-header h1 {
+        font-size: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    .avatar-section {
+        margin-bottom: 16px;
+    }
+
+    .avatar-grid {
+        gap: 6px;
+    }
+
+    .avatar-option {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    /* Lobby optimizations for landscape */
+    .header-area {
+        min-height: 50px;
+        margin-bottom: 16px;
+    }
+
+    .page-title h1 {
+        font-size: 20px;
+    }
+
+    .user-info-section {
+        padding: 8px 12px;
+    }
+
+    .user-avatar-display {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+    }
+
+    .voting-section {
+        padding: 12px;
+    }
+
+    .vote-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+
+    .request-btn {
+        padding: 8px 14px;
+        font-size: 11px;
+    }
+
+    .users, .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+    }
+
+    .userCard {
+        padding: 10px 8px;
+        min-height: 130px;
+    }
+
+    .user-card-avatar {
+        font-size: 40px;
+        margin-bottom: 6px;
+    }
+
+    .userCard h3 {
+        font-size: 11px;
+    }
+
+    .userCard p {
+        font-size: 10px;
+    }
+
+    .statistics-section {
+        margin-top: 12px;
+        gap: 10px;
+    }
+
+    .stat-card {
+        padding: 10px 16px;
+    }
+
+    .stat-value {
+        font-size: 22px;
+    }
+
+    hr, .divider {
+        margin: 16px 0;
+    }
+}
+
+/* Very small landscape screens */
+@media (max-width: 480px) and (orientation: landscape) {
+    .join-container {
+        padding: 12px;
+        max-height: 96vh;
+    }
+
+    .join-header h1 {
+        font-size: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .avatar-grid {
+        grid-template-columns: repeat(10, 1fr);
+        gap: 4px;
+    }
+
+    .avatar-option {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .users, .users-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
+    .userCard {
+        padding: 8px 6px;
+        min-height: 120px;
+    }
+
+    .user-card-avatar {
+        font-size: 36px;
     }
 }
