@@ -38,7 +38,7 @@ io.on('connection', (socket) => {
         avatar = encodeHTML(avatar || '👤');
 
         socket.join(room);
-        if (!rooms[room]) rooms[room] = { master: null, users: {} };
+        if (!rooms[room]) rooms[room] = { master: null, users: {}, votesRevealed: false };
 
         // Check if user with same name exists (reconnection scenario)
         let existingUserId = null;
@@ -102,13 +102,22 @@ io.on('connection', (socket) => {
         if (rooms[room] && rooms[room].users[socket.id]) {
             rooms[room].users[socket.id].vote = vote;
 
-            // // Eğer tüm kullanıcılar oy kullandıysa Scrum Master'a bildir
-            // if (Object.values(rooms[room].users).every(user => user.vote !== null)) {
-            //     io.to(rooms[room].master).emit('allVoted');
-            // }
-
-            // Kullanıcıların güncellenmiş listesini gönder
-            io.to(room).emit('updateUsers', rooms[room].users);
+            // If votes were revealed and someone changes their vote, reset all clients
+            if (rooms[room].votesRevealed) {
+                rooms[room].votesRevealed = false;
+                // Reset all OTHER votes to null (keep the new vote from current user)
+                for (let userId in rooms[room].users) {
+                    if (userId !== socket.id) {
+                        rooms[room].users[userId].vote = null;
+                    }
+                }
+                // Broadcast reset to all clients
+                io.to(room).emit('votesReset', rooms[room].users);
+            } else {
+                // Normal vote update
+                // Kullanıcıların güncellenmiş listesini gönder
+                io.to(room).emit('updateUsers', rooms[room].users);
+            }
         }
     });
 
@@ -118,6 +127,9 @@ io.on('connection', (socket) => {
         room = encodeHTML(room);
 
         if (rooms[room] && socket.id === rooms[room].master) {
+
+            // Mark votes as revealed
+            rooms[room].votesRevealed = true;
 
             const users = rooms[room].users;
             let totalVotes = 0;
@@ -232,6 +244,7 @@ io.on('connection', (socket) => {
         room = encodeHTML(room);
 
         if (rooms[room]) {
+            rooms[room].votesRevealed = false;
             for (let userId in rooms[room].users) {
                 rooms[room].users[userId].vote = null;
             }

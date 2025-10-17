@@ -11,7 +11,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
-    <title>Planning Poker - Agile Scrum Estimation Tool</title>
+    <title>Scrum Poker - Agile Scrum Estimation Tool</title>
     <meta
         name="description"
         content="Engage in interactive, fun, and effective Scrum planning with our free online Agile Scrum Master Game. Perfect for remote teams, this tool simplifies your Agile estimation and planning process."
@@ -474,7 +474,6 @@
             if (statistics) {
                 votesRevealed = true; // Mark votes as revealed
                 document.getElementById('statisticsSection').style.display = 'flex';
-                document.getElementById('averageValue').textContent = statistics.average;
                 document.getElementById('mostCommonValue').textContent = statistics.median;
                 document.getElementById('consensusValue').textContent = statistics.consensus;
             }
@@ -499,7 +498,7 @@
                 const questionClass = user.hasQuestion ? 'has-question' : '';
                 const awayClass = user.isAway ? 'is-away' : '';
                 const masterClass = user.isMaster ? 'is-master' : '';
-                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : 'Not voted');
+                const voteDisplay = user.isMaster ? 'Voted' : (user.isAway ? '💤' : (user.vote !== null ? 'Voted' : 'Not voted'));
                 const masterBadge = user.isMaster ? ' 👑' : '';
                 const userAvatar = user.avatar || '👤';
 
@@ -509,7 +508,7 @@
                     : '';
 
                 userList += `
-            <div class="userCard ${user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}" data-socket-id="${user.socketId}">
+            <div class="userCard ${user.vote !== null || user.isMaster ? 'voted' : ''} ${breakClass} ${questionClass} ${awayClass} ${masterClass}" data-socket-id="${user.socketId}">
                 ${vibrateButton}
                 <div class="user-card-avatar">${userAvatar}</div>
                 <h3>${user.name}${masterBadge}</h3>
@@ -528,7 +527,6 @@
             // Hide statistics section
             votesRevealed = false; // Reset voting state
             document.getElementById('statisticsSection').style.display = 'none';
-            document.getElementById('averageValue').textContent = '-';
             document.getElementById('mostCommonValue').textContent = '-';
             document.getElementById('consensusValue').textContent = '-';
 
@@ -536,6 +534,16 @@
             voteButtons.forEach(button => {
                 button.classList.remove('active');
             });
+
+            // Re-activate the current user's vote button if they have voted
+            const currentUser = users[socket.id];
+            if (currentUser && currentUser.vote !== null && currentUser.vote !== 'null') {
+                voteButtons.forEach(button => {
+                    if (button.textContent === String(currentUser.vote)) {
+                        button.classList.add('active');
+                    }
+                });
+            }
 
         });
 
@@ -842,10 +850,6 @@
 
                 <!-- Statistics Section (shown only when votes are revealed) -->
                 <div id="statisticsSection" class="statistics-section" style="display: none;">
-                    <div class="stat-card">
-                        <div class="stat-label">📊 Average</div>
-                        <div class="stat-value" id="averageValue">-</div>
-                    </div>
                     <div class="stat-card">
                         <div class="stat-label">🎯 Most Common</div>
                         <div class="stat-value" id="mostCommonValue">-</div>
