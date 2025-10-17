@@ -659,20 +659,20 @@
 
         // Receive vibration
         socket.on('receiveVibration', function(data) {
+            // Play MSN-style notification sound (always play, regardless of DOM state)
+            playNotificationSound();
+
             const userCard = document.querySelector(`.userCard[data-socket-id="${socket.id}"]`);
             if (userCard) {
                 userCard.classList.add('vibrating');
-
-                // Play MSN-style notification sound
-                playNotificationSound();
 
                 // Remove animation class after animation completes
                 setTimeout(() => {
                     userCard.classList.remove('vibrating');
                 }, 500);
-
-                console.log(`Vibration received from Scrum Master!`);
             }
+
+            console.log(`Vibration received from Scrum Master!`);
         });
 
 
