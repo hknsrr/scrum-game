@@ -84,6 +84,10 @@
         let votesRevealed = false; // Track if votes are currently revealed
         const SESSION_DURATION = 6 * 60 * 60 * 1000; // 6 saat
 
+        // Audio setup for mobile browser support
+        let notificationAudio = null;
+        let audioUnlocked = false;
+
         // Theme toggle functionality
         function toggleTheme() {
             const html = document.documentElement;
@@ -315,6 +319,9 @@
             isMaster = document.getElementById('isMaster').checked;
 
             if (name && room) {
+                // Unlock audio for mobile browsers on first user interaction
+                unlockAudio();
+
                 currentRoom = room;
                 userName = name;
 
@@ -549,6 +556,11 @@
 
         // Toggle vote function - allows deselecting
         function toggleVote(e, vote) {
+            // Unlock audio on first vote interaction (backup for mobile browsers)
+            if (!audioUnlocked) {
+                unlockAudio();
+            }
+
             const btn = e.target;
             const isActive = btn.classList.contains('active');
 
@@ -592,6 +604,11 @@
 
         // Break request toggle
         function toggleBreakRequest() {
+            // Unlock audio on interaction (backup for mobile browsers)
+            if (!audioUnlocked) {
+                unlockAudio();
+            }
+
             const btn = document.getElementById('breakRequestBtn');
             const isActive = btn.classList.contains('active');
 
@@ -606,6 +623,11 @@
 
         // Question toggle
         function toggleQuestion() {
+            // Unlock audio on interaction (backup for mobile browsers)
+            if (!audioUnlocked) {
+                unlockAudio();
+            }
+
             const btn = document.getElementById('questionBtn');
             const isActive = btn.classList.contains('active');
 
@@ -648,13 +670,53 @@
             }, 600);
         }
 
+        // Initialize and unlock audio for mobile browsers
+        function initializeAudio() {
+            if (!notificationAudio) {
+                notificationAudio = new Audio('nudge.mp3');
+                notificationAudio.volume = 0.7;
+                // Preload the audio
+                notificationAudio.load();
+            }
+            return notificationAudio;
+        }
+
+        // Unlock audio on first user interaction (required for mobile browsers)
+        function unlockAudio() {
+            if (audioUnlocked) return;
+
+            const audio = initializeAudio();
+            // Play and immediately pause to unlock audio context
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    audio.pause();
+                    audio.currentTime = 0;
+                    audioUnlocked = true;
+                    console.log('Audio unlocked for mobile browser');
+                }).catch(error => {
+                    console.log('Audio unlock failed:', error);
+                });
+            }
+        }
+
         // Play MSN Messenger nudge sound
         function playNotificationSound() {
-            const audio = new Audio('nudge.mp3');
-            audio.volume = 0.7;
-            audio.play().catch(error => {
-                console.log('Audio playback failed:', error);
-            });
+            const audio = initializeAudio();
+
+            // Reset audio to start
+            audio.currentTime = 0;
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log('Audio playback failed:', error);
+                    // Try to unlock audio if it failed
+                    if (!audioUnlocked) {
+                        console.log('Attempting to unlock audio...');
+                    }
+                });
+            }
         }
 
         // Receive vibration
